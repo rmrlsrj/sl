@@ -1,1 +1,260 @@
-test
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>셋리스트</title>
+<style>
+:root{--fs:22px}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{font-family:'Pretendard','Noto Sans KR','Malgun Gothic',sans-serif;color:#fff}
+body.view{background:transparent;overflow:hidden}
+body.control{background:#1c1d23;font-size:14px;padding:10px}
+body.view #panel{display:none}
+
+/* 조작부 */
+#panel{margin-bottom:12px}
+#ta{width:100%;height:84px;resize:vertical;padding:8px;border-radius:8px;border:1px solid #3a3c46;background:#12131a;color:#fff;font:inherit}
+.row{display:flex;gap:6px;flex-wrap:wrap;align-items:center;margin-top:6px}
+button{font:inherit;cursor:pointer;border:0;border-radius:8px;padding:7px 12px;background:#33353f;color:#fff}
+button:hover{background:#40424e}
+button:disabled{opacity:.4;cursor:default}
+button.main{background:#1fbf6b;color:#06210f;font-weight:700}
+button.main:hover{background:#27d377}
+button.danger.arm{background:#c0392b}
+label{display:flex;align-items:center;gap:6px;color:#c8cad4}
+.hint{color:#8a8d9a;font-size:12px;margin-top:6px}
+
+/* 목록 */
+#list{margin:0;padding:0;display:flex;flex-direction:column;gap:10px}
+body.view #list{padding:8px}
+.card{position:relative;display:flex;align-items:center;gap:12px;padding:.55em .9em;border-radius:14px;
+  background:rgba(18,20,28,.72);border:1px solid rgba(255,255,255,.14);font-size:var(--fs)}
+body.control .card{font-size:15px}
+.no{min-width:1.8em;font-weight:700;color:rgba(255,255,255,.62);font-variant-numeric:tabular-nums}
+.t{flex:1;font-weight:700;line-height:1.3;word-break:break-all}
+.now{flex-direction:column;align-items:flex-start;gap:.4em;padding:.8em 1em;border-color:rgba(46,204,113,.55)}
+.now .line{display:flex;align-items:center;gap:12px;width:100%}
+.now .t{font-size:1.25em}
+.badge{font-size:.55em;font-weight:800;background:#1fbf6b;color:#06210f;padding:.2em .7em;border-radius:6px}
+.empty{color:rgba(255,255,255,.55);font-weight:600}
+.done{opacity:.4}
+.done .t{text-decoration:line-through}
+.del{background:none;color:#ff9a9a;padding:2px 6px;font-size:.9em}
+.del:hover{background:rgba(255,255,255,.1)}
+.grip{width:18px;height:14px;flex:none;cursor:grab;opacity:.7;
+  background:linear-gradient(#fff 0 0) 0 0/100% 2px no-repeat,linear-gradient(#fff 0 0) 0 50%/100% 2px no-repeat,linear-gradient(#fff 0 0) 0 100%/100% 2px no-repeat}
+.grip:hover{opacity:1}
+body.view .del,body.view .grip{display:none}
+.dragging{opacity:.35}
+.wait.before{box-shadow:0 -4px 0 0 #4da3ff}
+.wait.after{box-shadow:0 4px 0 0 #4da3ff}
+</style>
+</head>
+<body>
+
+<div id="panel">
+  <textarea id="ta" placeholder="신청곡을 붙여넣기 (한 줄에 한 곡)"></textarea>
+  <div class="row">
+    <button id="add" class="main">추가</button>
+    <button id="next" class="main">다음 / 완료</button>
+    <button id="undo">되돌리기</button>
+  </div>
+  <div class="row">
+    <label>방송 글자 크기 <input id="fs" type="range" min="14" max="44" step="1"></label>
+    <label><input id="hide" type="checkbox"> 부른 곡 숨기기(방송)</label>
+    <button id="reset" class="danger">전체 초기화</button>
+  </div>
+  <div class="hint">Ctrl+Enter로 추가 · 대기 곡은 오른쪽 ≡를 잡고 끌어서 순서 변경</div>
+</div>
+
+<div id="list"></div>
+
+<script>
+const K = 'setlist.v1', C = 'setlist.cfg';
+const mode = new URLSearchParams(location.search).get('mode') === 'view' ? 'view' : 'control';
+document.body.className = mode;
+
+let S = { q: [], d: [], h: [] };   // q: 대기열(q[0]=Now Playing), d: 부른 곡, h: 되돌리기 기록
+let cfg = { fs: 22, hide: false };
+let drag = -1, drop = -1, lastRaw = '';
+
+function load() {
+  try {
+    const raw = localStorage.getItem(K) || '';
+    const s = JSON.parse(raw || 'null');
+    if (s && Array.isArray(s.q) && Array.isArray(s.d)) S = { q: s.q, d: s.d, h: s.h || [] };
+    else S = { q: [], d: [], h: [] };
+    const craw = localStorage.getItem(C) || '';
+    const c = JSON.parse(craw || 'null');
+    if (c) cfg = { ...cfg, ...c };
+    lastRaw = raw + '|' + craw;
+  } catch (e) {}
+}
+function save() {
+  try {
+    const raw = JSON.stringify(S), craw = JSON.stringify(cfg);
+    localStorage.setItem(K, raw);
+    localStorage.setItem(C, craw);
+    lastRaw = raw + '|' + craw;
+  } catch (e) {}
+}
+function commit(fn) {
+  S.h.push(JSON.stringify({ q: S.q, d: S.d }));
+  if (S.h.length > 30) S.h.shift();
+  fn(); save(); render();
+}
+const uid = () => Date.now().toString(36) + Math.random().toString(36).slice(2, 6);
+function el(tag, cls, text) {
+  const e = document.createElement(tag);
+  if (cls) e.className = cls;
+  if (text !== undefined) e.textContent = text;
+  return e;
+}
+
+function render() {
+  document.documentElement.style.setProperty('--fs', cfg.fs + 'px');
+  const L = document.getElementById('list');
+  L.textContent = '';
+  const nd = S.d.length;
+
+  // Now Playing
+  const now = el('div', 'card now');
+  if (S.q[0]) {
+    now.appendChild(el('div', 'badge', 'NOW PLAYING'));
+    const line = el('div', 'line');
+    line.append(el('span', 'no', nd + 1), el('span', 't', S.q[0].t));
+    const del = el('button', 'del', '✕'); del.title = '삭제'; del.dataset.id = S.q[0].id;
+    line.appendChild(del);
+    now.appendChild(line);
+  } else {
+    now.appendChild(el('div', 'empty', S.d.length ? '모든 곡을 불렀어요' : '신청곡을 추가해 주세요'));
+  }
+  L.appendChild(now);
+
+  // 대기 곡
+  for (let i = 1; i < S.q.length; i++) {
+    const c = el('div', 'card wait'); c.dataset.i = i;
+    const del = el('button', 'del', '✕'); del.title = '삭제'; del.dataset.id = S.q[i].id;
+    c.append(el('span', 'no', nd + i + 1), el('span', 't', S.q[i].t), del, el('span', 'grip'));
+    L.appendChild(c);
+  }
+
+  // 부른 곡 (맨 아래, 이동 불가)
+  if (!(mode === 'view' && cfg.hide)) {
+    S.d.forEach((s, j) => {
+      const c = el('div', 'card done');
+      c.append(el('span', 'no', j + 1), el('span', 't', s.t));
+      L.appendChild(c);
+    });
+  }
+
+  document.getElementById('next').disabled = !S.q.length;
+  document.getElementById('undo').disabled = !S.h.length;
+}
+
+/* 조작부 이벤트 */
+function addSongs() {
+  const ta = document.getElementById('ta');
+  const songs = ta.value.split(/\r?\n/)
+    .map(l => l.trim().replace(/^\d+\s*[.)]\s*/, '').trim())
+    .filter(Boolean);
+  if (!songs.length) return;
+  commit(() => songs.forEach(t => S.q.push({ id: uid(), t })));
+  ta.value = '';
+}
+document.getElementById('add').onclick = addSongs;
+document.getElementById('ta').addEventListener('keydown', e => {
+  if (e.ctrlKey && e.key === 'Enter') addSongs();
+});
+document.getElementById('next').onclick = () => {
+  if (!S.q.length) return;
+  commit(() => S.d.push(S.q.shift()));
+};
+document.getElementById('undo').onclick = () => {
+  if (!S.h.length) return;
+  const p = JSON.parse(S.h.pop());
+  S.q = p.q; S.d = p.d; save(); render();
+};
+const fsEl = document.getElementById('fs'), hideEl = document.getElementById('hide');
+fsEl.oninput = () => { cfg.fs = +fsEl.value; save(); render(); };
+hideEl.onchange = () => { cfg.hide = hideEl.checked; save(); render(); };
+
+let armTimer = 0;
+const resetBtn = document.getElementById('reset');
+resetBtn.onclick = () => {
+  if (!resetBtn.classList.contains('arm')) {
+    resetBtn.classList.add('arm'); resetBtn.textContent = '정말 초기화? (다시 클릭)';
+    armTimer = setTimeout(disarm, 3000); return;
+  }
+  disarm();
+  commit(() => { S.q = []; S.d = []; });
+};
+function disarm() {
+  clearTimeout(armTimer);
+  resetBtn.classList.remove('arm'); resetBtn.textContent = '전체 초기화';
+}
+
+/* 삭제 */
+document.getElementById('list').addEventListener('click', e => {
+  const b = e.target.closest('.del');
+  if (!b) return;
+  commit(() => { S.q = S.q.filter(s => s.id !== b.dataset.id); });
+});
+
+/* 드래그로 순서 변경 (대기 곡만) */
+const L = document.getElementById('list');
+function clearMarks() { L.querySelectorAll('.before,.after').forEach(n => n.classList.remove('before', 'after')); }
+L.addEventListener('mousedown', e => {
+  const g = e.target.closest('.grip');
+  if (g) g.closest('.card').draggable = true;
+});
+document.addEventListener('mouseup', () => {
+  L.querySelectorAll('.card[draggable="true"]').forEach(c => c.draggable = false);
+});
+L.addEventListener('dragstart', e => {
+  const c = e.target.closest ? e.target.closest('.card.wait') : null;
+  if (!c || !c.draggable) { e.preventDefault(); return; }
+  drag = +c.dataset.i; drop = -1;
+  e.dataTransfer.effectAllowed = 'move';
+  e.dataTransfer.setData('text/plain', 'song');
+  c.classList.add('dragging');
+});
+L.addEventListener('dragover', e => {
+  if (drag < 0) return;
+  e.preventDefault();
+  const c = e.target.closest('.card.wait');
+  if (!c) return;
+  clearMarks();
+  const r = c.getBoundingClientRect(), i = +c.dataset.i;
+  const before = e.clientY < r.top + r.height / 2;
+  c.classList.add(before ? 'before' : 'after');
+  drop = before ? i : i + 1;
+});
+L.addEventListener('drop', e => {
+  if (drag < 0) return;
+  e.preventDefault();
+  let to = drop, from = drag;
+  if (to >= 1) {
+    if (to > from) to--;
+    if (to !== from) commit(() => { const [x] = S.q.splice(from, 1); S.q.splice(to, 0, x); });
+  }
+});
+L.addEventListener('dragend', () => { drag = -1; drop = -1; render(); });
+
+/* 동기화: storage 이벤트 + 1초 폴링(안전장치) */
+function sync() {
+  if (drag >= 0) return;
+  const raw = (localStorage.getItem(K) || '') + '|' + (localStorage.getItem(C) || '');
+  if (raw !== lastRaw) { load(); syncControls(); render(); }
+}
+window.addEventListener('storage', sync);
+setInterval(sync, 1000);
+
+function syncControls() { fsEl.value = cfg.fs; hideEl.checked = cfg.hide; }
+
+load(); syncControls(); render();
+</script>
+</body>
+</html>
