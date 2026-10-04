@@ -37,6 +37,7 @@ body.control #title{font-size:calc(var(--tfs)*.55px);padding:2px 2px 6px}
 #msg,#tt{flex:1;min-width:140px;padding:7px 8px;border-radius:8px;border:1px solid #3a3c46;background:#12131a;color:#fff;font:inherit}
 .sws{display:flex;gap:5px;align-items:center}
 .sw{width:22px;height:22px;padding:0;border-radius:50%;border:2px solid #555}
+input:disabled{opacity:.4;cursor:default}
 input[type=color]{width:34px;height:26px;padding:0;border:0;background:none;cursor:pointer}
 #head{display:none;margin:8px 8px 0;padding:10px 14px;border-radius:14px;
   background:rgba(18,20,28,.72);border:1px solid rgba(255,255,255,.14)}
@@ -60,8 +61,8 @@ body.view #list{padding:8px}
 .card{position:relative;display:flex;align-items:center;gap:12px;padding:.55em .9em;border-radius:14px;
   background:rgba(18,20,28,.72);border:1px solid rgba(255,255,255,.14);font-size:var(--fs)}
 body.control .card{font-size:15px}
-.no{min-width:1.8em;font-weight:700;color:rgba(255,255,255,.62);font-variant-numeric:tabular-nums}
-.t{flex:1;font-weight:700;line-height:1.3;word-break:break-all}
+.no{min-width:1.8em;font-weight:var(--w,700);color:rgba(255,255,255,.62);font-variant-numeric:tabular-nums}
+.t{flex:1;font-weight:var(--w,700);line-height:1.3;word-break:break-all}
 .now{flex-direction:column;align-items:flex-start;gap:.4em;padding:.8em 1em;border-color:rgba(46,204,113,.55)}
 .now .line{display:flex;align-items:center;gap:12px;width:100%}
 .now .t{font-size:1.25em}
@@ -178,6 +179,7 @@ function render() {
   T.style.color = cfg.tc;
   T.style.textAlign = cfg.ta;
   applyFont(T, cfg.tf);
+  tbEl.disabled = WEB_NAMES.has(cfg.tf);
   document.querySelectorAll('#tal button').forEach(b => b.classList.toggle('on', b.dataset.a === cfg.ta));
   const B = document.getElementById('banner');
   B.textContent = cfg.msg;
@@ -188,6 +190,7 @@ function render() {
   B.style.color = cfg.mc;
   B.style.textAlign = cfg.ma;
   applyFont(B, cfg.mf);
+  mbEl.disabled = WEB_NAMES.has(cfg.mf);
   document.querySelectorAll('#mal button').forEach(b => b.classList.toggle('on', b.dataset.a === cfg.ma));
   const L = document.getElementById('list');
   L.textContent = '';
@@ -296,9 +299,21 @@ const WEB_GROUPS = [
 const WEB_NAMES = new Set(WEB_GROUPS.flatMap(g => g[1].map(i => i[0])));
 const LOCAL_CANDIDATES = ['맑은 고딕', 'Noto Sans KR'];
 function ff(n) { return n ? '"' + n.replace(/"/g, '') + '", sans-serif' : ''; }
+function weightOf(n) {
+  if (/(UltraLight|ExtraLight)$/.test(n)) return 200;
+  if (/(Light|Acl)$/.test(n)) return 300;
+  if (/SemiBold$/.test(n)) return 600;
+  if (/(ExtraBold|Aceb)$/.test(n)) return 800;
+  if (/Heavy$/.test(n)) return 900;
+  if (/(Bold|Acb)$/.test(n)) return 700;
+  return 400;
+}
 function applyFont(node, n) {
+  const web = WEB_NAMES.has(n);
   node.style.fontFamily = ff(n);
-  node.style.fontSynthesis = WEB_NAMES.has(n) ? 'none' : '';
+  node.style.fontSynthesis = web ? 'none' : '';
+  node.style.setProperty('--w', web ? weightOf(n) : '');
+  if (web) node.style.fontWeight = weightOf(n);
 }
 function hasFont(n) {
   const c = hasFont.c || (hasFont.c = document.createElement('canvas').getContext('2d'));
