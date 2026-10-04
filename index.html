@@ -25,6 +25,16 @@ button.main:hover{background:#27d377}
 button.danger.arm{background:#c0392b}
 label{display:flex;align-items:center;gap:6px;color:#c8cad4}
 .hint{color:#8a8d9a;font-size:12px;margin-top:6px}
+#msg{flex:1;min-width:140px;padding:7px 8px;border-radius:8px;border:1px solid #3a3c46;background:#12131a;color:#fff;font:inherit}
+.sws{display:flex;gap:5px;align-items:center}
+.sw{width:22px;height:22px;padding:0;border-radius:50%;border:2px solid #555}
+input[type=color]{width:34px;height:26px;padding:0;border:0;background:none;cursor:pointer}
+.sep{border:0;border-top:1px solid #33353f;margin:12px 0 4px}
+
+/* 상단 메시지 */
+#banner{display:none;padding:8px 10px 0;line-height:1.3;white-space:pre-wrap;word-break:break-all;
+  text-shadow:0 2px 6px rgba(0,0,0,.85),0 0 2px rgba(0,0,0,.9);font-size:calc(var(--mfs)*1px)}
+body.control #banner{font-size:calc(var(--mfs)*.55px);padding:2px 2px 8px}
 
 /* 목록 */
 #list{margin:0;padding:0;display:flex;flex-direction:column;gap:10px}
@@ -55,6 +65,14 @@ body.view .del,body.view .grip{display:none}
 <body>
 
 <div id="panel">
+  <div class="row" style="margin-top:0"><input id="msg" type="text" placeholder="상단 메시지 (예: 한식 노래방~)"></div>
+  <div class="row">
+    <label>글자 <input id="mfs" type="range" min="14" max="72"></label>
+    <label><input id="mb" type="checkbox"> 굵게</label>
+    <span class="sws" id="sws"></span>
+    <input id="mc" type="color" title="직접 색 고르기">
+  </div>
+  <hr class="sep">
   <textarea id="ta" placeholder="신청곡을 붙여넣기 (한 줄에 한 곡)"></textarea>
   <div class="row">
     <button id="add" class="main">추가</button>
@@ -69,6 +87,7 @@ body.view .del,body.view .grip{display:none}
   <div class="hint">Ctrl+Enter로 추가 · 대기 곡은 오른쪽 ≡를 잡고 끌어서 순서 변경</div>
 </div>
 
+<div id="banner"></div>
 <div id="list"></div>
 
 <script>
@@ -77,7 +96,7 @@ const mode = new URLSearchParams(location.search).get('mode') === 'view' ? 'view
 document.body.className = mode;
 
 let S = { q: [], d: [], h: [] };   // q: 대기열(q[0]=Now Playing), d: 부른 곡, h: 되돌리기 기록
-let cfg = { fs: 22, hide: false };
+let cfg = { fs: 22, hide: false, msg: '', mfs: 30, mb: true, mc: '#ffffff' };
 let drag = -1, drop = -1, lastRaw = '';
 
 function load() {
@@ -115,6 +134,12 @@ function el(tag, cls, text) {
 
 function render() {
   document.documentElement.style.setProperty('--fs', cfg.fs + 'px');
+  document.documentElement.style.setProperty('--mfs', cfg.mfs);
+  const B = document.getElementById('banner');
+  B.textContent = cfg.msg;
+  B.style.display = cfg.msg ? 'block' : 'none';
+  B.style.fontWeight = cfg.mb ? '800' : '400';
+  B.style.color = cfg.mc;
   const L = document.getElementById('list');
   L.textContent = '';
   const nd = S.d.length;
@@ -180,6 +205,18 @@ document.getElementById('undo').onclick = () => {
 const fsEl = document.getElementById('fs'), hideEl = document.getElementById('hide');
 fsEl.oninput = () => { cfg.fs = +fsEl.value; save(); render(); };
 hideEl.onchange = () => { cfg.hide = hideEl.checked; save(); render(); };
+
+const msgEl = document.getElementById('msg'), mfsEl = document.getElementById('mfs'),
+      mbEl = document.getElementById('mb'), mcEl = document.getElementById('mc');
+msgEl.oninput = () => { cfg.msg = msgEl.value; save(); render(); };
+mfsEl.oninput = () => { cfg.mfs = +mfsEl.value; save(); render(); };
+mbEl.onchange = () => { cfg.mb = mbEl.checked; save(); render(); };
+mcEl.oninput = () => { cfg.mc = mcEl.value; save(); render(); };
+['#ffffff', '#ffe14d', '#ff8fb8', '#7fd6ff', '#8cf29a', '#ffab5e'].forEach(c => {
+  const b = el('button', 'sw'); b.style.background = c; b.title = c;
+  b.onclick = () => { cfg.mc = c; mcEl.value = c; save(); render(); };
+  document.getElementById('sws').appendChild(b);
+});
 
 let armTimer = 0;
 const resetBtn = document.getElementById('reset');
@@ -252,7 +289,11 @@ function sync() {
 window.addEventListener('storage', sync);
 setInterval(sync, 1000);
 
-function syncControls() { fsEl.value = cfg.fs; hideEl.checked = cfg.hide; }
+function syncControls() {
+  fsEl.value = cfg.fs; hideEl.checked = cfg.hide;
+  if (document.activeElement !== msgEl) msgEl.value = cfg.msg;
+  mfsEl.value = cfg.mfs; mbEl.checked = cfg.mb; mcEl.value = cfg.mc;
+}
 
 load(); syncControls(); render();
 </script>
