@@ -4,6 +4,12 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>셋리스트</title>
+<link href="https://hangeul.pstatic.net/hangeul_static/css/nanum-gothic.css" rel="stylesheet">
+<link href="https://hangeul.pstatic.net/hangeul_static/css/nanum-barun-gothic.css" rel="stylesheet">
+<link href="https://hangeul.pstatic.net/hangeul_static/css/nanum-square.css" rel="stylesheet">
+<link href="https://hangeul.pstatic.net/hangeul_static/css/nanum-square-neo.css" rel="stylesheet">
+<link href="https://hangeul.pstatic.net/hangeul_static/css/nanum-square-round.css" rel="stylesheet">
+<link href="https://hangeul.pstatic.net/hangeul_static/css/maru-buri.css" rel="stylesheet">
 <style>
 :root{--fs:22px}
 *{box-sizing:border-box}
@@ -108,7 +114,6 @@ body.view .del,body.view .grip{display:none}
     <button id="reset" class="danger">전체 초기화</button>
   </div>
   <div class="row"><label>곡 목록 폰트 <select id="lf" class="fsel"></select></label></div>
-  <div class="row"><button id="loadfonts">내 PC 폰트 불러오기</button><span id="fstat" class="hint" style="margin:0"></span></div>
   <div class="hint">Ctrl+Enter로 추가 · 대기 곡은 오른쪽 ≡를 잡고 끌어서 순서 변경</div>
 </div>
 
@@ -172,7 +177,7 @@ function render() {
   T.style.fontWeight = cfg.tb ? '800' : '400';
   T.style.color = cfg.tc;
   T.style.textAlign = cfg.ta;
-  T.style.fontFamily = ff(cfg.tf);
+  applyFont(T, cfg.tf);
   document.querySelectorAll('#tal button').forEach(b => b.classList.toggle('on', b.dataset.a === cfg.ta));
   const B = document.getElementById('banner');
   B.textContent = cfg.msg;
@@ -182,11 +187,11 @@ function render() {
   B.style.fontWeight = cfg.mb ? '800' : '400';
   B.style.color = cfg.mc;
   B.style.textAlign = cfg.ma;
-  B.style.fontFamily = ff(cfg.mf);
+  applyFont(B, cfg.mf);
   document.querySelectorAll('#mal button').forEach(b => b.classList.toggle('on', b.dataset.a === cfg.ma));
   const L = document.getElementById('list');
   L.textContent = '';
-  L.style.fontFamily = ff(cfg.lf);
+  applyFont(L, cfg.lf);
   const nd = S.d.length;
 
   // Now Playing
@@ -279,13 +284,22 @@ tcEl.oninput = () => { cfg.tc = tcEl.value; save(); render(); };
 });
 
 /* 폰트 선택 */
-const FONT_CANDIDATES = ['Pretendard', 'Noto Sans KR', 'Noto Serif KR', '맑은 고딕', '나눔고딕', '나눔바른고딕',
-  '나눔스퀘어', '나눔스퀘어 네오', '나눔명조', '나눔손글씨 붓', '나눔손글씨 펜', '배달의민족 주아', '배달의민족 한나',
-  '배달의민족 도현', '배달의민족 연성', 'Gmarket Sans', 'SUIT', 'KoPubWorld돋움체', '에스코어 드림', 'IBM Plex Sans KR',
-  'Spoqa Han Sans Neo', '고운돋움', '고운바탕', 'Black Han Sans', 'Do Hyeon', 'Jua', 'Gothic A1', 'Nanum Gothic',
-  'Nanum Myeongjo', '바탕', '돋움', '굴림', '궁서', 'Arial', 'Segoe UI', 'Impact', 'Georgia', 'Times New Roman',
-  'Verdana', 'Tahoma', 'Comic Sans MS'];
+const WEB_GROUPS = [
+  ['나눔고딕', [['NanumGothicLight','가는'],['NanumGothic','보통'],['NanumGothicBold','굵게'],['NanumGothicExtraBold','아주 굵게']]],
+  ['나눔바른고딕', [['NanumBarunGothicUltraLight','아주 가는'],['NanumBarunGothicLight','가는'],['NanumBarunGothic','보통'],['NanumBarunGothicBold','굵게']]],
+  ['나눔스퀘어', [['NanumSquareLight','가는'],['NanumSquare','보통'],['NanumSquareBold','굵게'],['NanumSquareExtraBold','아주 굵게']]],
+  ['나눔스퀘어 AC', [['NanumSquareAcl','가는'],['NanumSquareAcr','보통'],['NanumSquareAcb','굵게'],['NanumSquareAceb','아주 굵게']]],
+  ['나눔스퀘어 네오', [['NanumSquareNeoLight','가는'],['NanumSquareNeo','보통'],['NanumSquareNeoBold','굵게'],['NanumSquareNeoExtraBold','아주 굵게'],['NanumSquareNeoHeavy','헤비']]],
+  ['나눔스퀘어라운드', [['NanumSquareRoundLight','가는'],['NanumSquareRound','보통'],['NanumSquareRoundBold','굵게'],['NanumSquareRoundExtraBold','아주 굵게']]],
+  ['마루 부리', [['MaruBuriExtraLight','아주 가는'],['MaruBuriLight','가는'],['MaruBuri','보통'],['MaruBuriSemiBold','약간 굵게'],['MaruBuriBold','굵게']]]
+];
+const WEB_NAMES = new Set(WEB_GROUPS.flatMap(g => g[1].map(i => i[0])));
+const LOCAL_CANDIDATES = ['맑은 고딕', 'Noto Sans KR'];
 function ff(n) { return n ? '"' + n.replace(/"/g, '') + '", sans-serif' : ''; }
+function applyFont(node, n) {
+  node.style.fontFamily = ff(n);
+  node.style.fontSynthesis = WEB_NAMES.has(n) ? 'none' : '';
+}
 function hasFont(n) {
   const c = hasFont.c || (hasFont.c = document.createElement('canvas').getContext('2d'));
   const s = 'mmmmmmmmmmlli한글あ';
@@ -294,49 +308,37 @@ function hasFont(n) {
     c.font = '72px "' + n + '",' + base; return c.measureText(s).width !== w0;
   });
 }
-let fontList = [];
-try { fontList = JSON.parse(localStorage.getItem('setlist.fonts') || '[]'); } catch (e) {}
-if (!fontList.length && mode === 'control') fontList = FONT_CANDIDATES.filter(hasFont);
+const localFonts = mode === 'control' ? LOCAL_CANDIDATES.filter(hasFont) : [];
 const FKEYS = ['tf', 'mf', 'lf'];
 function fillSelects() {
   if (mode !== 'control') return;
   FKEYS.forEach(key => {
     const sel = document.getElementById(key);
     sel.textContent = '';
-    const names = ['', ...fontList];
-    if (cfg[key] && !fontList.includes(cfg[key])) names.push(cfg[key]);
-    names.forEach(n => {
-      const o = el('option', '', n || '기본 글꼴'); o.value = n;
-      if (n) o.style.fontFamily = ff(n);
-      sel.appendChild(o);
+    const o0 = el('option', '', '기본 글꼴'); o0.value = ''; sel.appendChild(o0);
+    WEB_GROUPS.forEach(([gname, items]) => {
+      const og = el('optgroup'); og.label = gname;
+      items.forEach(([fam, w]) => {
+        const o = el('option', '', gname + ' ' + w); o.value = fam; og.appendChild(o);
+      });
+      sel.appendChild(og);
     });
+    if (localFonts.length) {
+      const og = el('optgroup'); og.label = '이 PC에 설치된 폰트';
+      localFonts.forEach(n => {
+        const o = el('option', '', n); o.value = n; o.style.fontFamily = ff(n); og.appendChild(o);
+      });
+      sel.appendChild(og);
+    }
+    if (cfg[key] && !WEB_NAMES.has(cfg[key]) && !localFonts.includes(cfg[key])) {
+      const o = el('option', '', cfg[key]); o.value = cfg[key]; sel.appendChild(o);
+    }
     sel.value = cfg[key];
   });
 }
 FKEYS.forEach(key => {
   document.getElementById(key).onchange = e => { cfg[key] = e.target.value; save(); render(); };
 });
-document.getElementById('loadfonts').onclick = async () => {
-  const st = document.getElementById('fstat');
-  if (!window.queryLocalFonts) { st.textContent = '이 환경에서는 전체 목록을 불러올 수 없어요. 후보 목록으로 표시합니다.'; return; }
-  st.textContent = '불러오는 중… (권한 창이 뜨면 허용해 주세요)';
-  try {
-    const arr = await Promise.race([
-      window.queryLocalFonts(),
-      new Promise((_, rej) => setTimeout(() => rej(new Error('timeout')), 6000))
-    ]);
-    const fam = [...new Set(arr.map(f => f.family))].sort((a, b) => a.localeCompare(b, 'ko'));
-    if (!fam.length) throw new Error('empty');
-    fontList = fam;
-    try { localStorage.setItem('setlist.fonts', JSON.stringify(fam)); } catch (e) {}
-    fillSelects();
-    st.textContent = fam.length + '개 불러왔어요.';
-  } catch (e) {
-    st.textContent = e && e.message === 'timeout'
-      ? '응답이 없어요. 이 환경에서는 전체 목록을 불러올 수 없는 것 같아요. 후보 목록으로 표시합니다.'
-      : '불러오지 못했어요(권한 거부 또는 미지원). 후보 목록으로 표시합니다.';
-  }
-};
 ['#ffffff', '#ffe14d', '#ff8fb8', '#7fd6ff', '#8cf29a', '#ffab5e'].forEach(c => {
   const b = el('button', 'sw'); b.style.background = c; b.title = c;
   b.onclick = () => { cfg.mc = c; mcEl.value = c; save(); render(); };
