@@ -32,6 +32,11 @@ body.control #title{font-size:calc(var(--tfs)*.55px);padding:2px 2px 6px}
 .sws{display:flex;gap:5px;align-items:center}
 .sw{width:22px;height:22px;padding:0;border-radius:50%;border:2px solid #555}
 input[type=color]{width:34px;height:26px;padding:0;border:0;background:none;cursor:pointer}
+#head{display:none;margin:8px 8px 0;padding:10px 14px;border-radius:14px;
+  background:rgba(18,20,28,.72);border:1px solid rgba(255,255,255,.14)}
+#head #title,#head #banner{padding:0;text-shadow:none}
+#head #title.sp{padding-bottom:8px;margin-bottom:8px;border-bottom:1px solid rgba(255,255,255,.18)}
+body.control #head{margin:0 0 10px;padding:8px 10px}
 .seg{display:flex;gap:2px}
 .seg button{padding:5px 9px}
 .seg button.on{background:#1fbf6b;color:#06210f;font-weight:700}
@@ -102,8 +107,10 @@ body.view .del,body.view .grip{display:none}
   <div class="hint">Ctrl+Enter로 추가 · 대기 곡은 오른쪽 ≡를 잡고 끌어서 순서 변경</div>
 </div>
 
-<div id="title"></div>
-<div id="banner"></div>
+<div id="head">
+  <div id="title"></div>
+  <div id="banner"></div>
+</div>
 <div id="list"></div>
 
 <script>
@@ -164,6 +171,8 @@ function render() {
   const B = document.getElementById('banner');
   B.textContent = cfg.msg;
   B.style.display = cfg.msg ? 'block' : 'none';
+  document.getElementById('head').style.display = (cfg.tt || cfg.msg) ? 'block' : 'none';
+  T.classList.toggle('sp', !!(cfg.tt && cfg.msg));
   B.style.fontWeight = cfg.mb ? '800' : '400';
   B.style.color = cfg.mc;
   B.style.textAlign = cfg.ma;
