@@ -41,7 +41,7 @@ label{display:flex;align-items:center;gap:6px;color:#c8cad4}
 .sec{margin-top:12px;padding-top:10px;border-top:1px solid #33353f}
 .sec:first-child{margin-top:6px}
 .sec h3{margin:0;font-size:13px;font-weight:700;color:#c8cad4}
-.sec h3 .sd{margin-left:6px;font-weight:400;font-size:12px;color:#8a8d9a}
+.sec h3 .sd{margin-right:8px;font-weight:400;font-size:12px;color:#8a8d9a}
 #title{display:none;padding:8px 10px 0;line-height:1.2;white-space:pre-wrap;word-break:break-all;
   text-shadow:0 2px 6px rgba(0,0,0,.85),0 0 2px rgba(0,0,0,.9);font-size:calc(var(--tfs)*1px)}
 body.control #title{font-size:calc(var(--tfs)*.55px);padding:2px 2px 6px}
@@ -127,7 +127,7 @@ body.view .del,body.view .edt,body.view .skp,body.view .grip{display:none}
   <button id="fold" type="button" title="서브 타이틀·메인 타이틀·곡 리스트 설정 접기/펼치기"><span>설정</span><span class="st" id="foldst">접기 ▴</span></button>
   <div id="settings">
     <section class="sec">
-      <h3>서브 타이틀 <span class="sd">첫째 줄</span></h3>
+      <h3><span class="sd">첫째 줄</span>서브 타이틀</h3>
       <div class="row"><input id="msg" type="text" placeholder="서브 타이틀 (예: 한식 노래방~)"></div>
       <div class="row">
         <label>크기 <input id="mfs" type="range" min="14" max="72"></label>
@@ -138,7 +138,7 @@ body.view .del,body.view .edt,body.view .skp,body.view .grip{display:none}
       <div class="row"><label>폰트 <select id="mf" class="fsel"></select></label></div>
     </section>
     <section class="sec">
-      <h3>메인 타이틀 <span class="sd">둘째 줄</span></h3>
+      <h3><span class="sd">둘째 줄</span>메인 타이틀</h3>
       <div class="row"><input id="tt" type="text" placeholder="메인 타이틀 (비우면 숨김)"></div>
       <div class="row">
         <label>크기 <input id="tfs" type="range" min="14" max="80"></label>
