@@ -67,6 +67,9 @@ body.control #head{margin:0 0 10px;padding:8px 10px}
 #panel.fold .sset{display:none}
 #panel.fold .mrow{margin-top:6px}
 #fold{white-space:nowrap}
+#panel.fold2 .sset2{display:none}
+.edt+.skp,.skp+.del,.edt+.del{margin-left:-10px}
+body.control .now .t{font-size:1em}
 
 /* 상단 메시지 */
 #banner{display:none;padding:8px 10px 0;line-height:1.3;white-space:pre-wrap;word-break:break-all;
@@ -91,7 +94,7 @@ body.control .card{font-size:15px}
 @keyframes mq{0%,15%{transform:translateX(0)}100%{transform:translateX(-50%)}}
 .badge{font-size:.55em;font-weight:800;background:#14ed9f;color:#04251a;padding:.2em .7em;border-radius:6px}
 .empty{color:rgba(255,255,255,.55);font-weight:600}
-.done{opacity:.7}
+.done{opacity:.6}
 .done .t{text-decoration:line-through}
 .del{background:none;color:#ff9a9a;padding:2px 6px;font-size:.9em}
 .del:hover{background:rgba(255,255,255,.1)}
@@ -141,12 +144,13 @@ body.view .del,body.view .edt,body.view .skp,body.view .grip{display:none}
     <button id="undo">되돌리기</button>
     <button id="copy">셋리스트 복사</button>
   </div>
-  <div class="row">
-    <label>방송 글자 크기 <input id="fs" type="range" min="14" max="44" step="1"></label>
+  <div class="row"><button id="fold2" type="button" title="방송 글자 크기·폰트·부른 곡 숨기기·전체 초기화 접기/펼치기">목록 설정 ▴</button></div>
+  <div class="row sset2"><label>방송 글자 크기 <input id="fs" type="range" min="14" max="44" step="1"></label></div>
+  <div class="row sset2"><label>곡 목록 폰트 <select id="lf" class="fsel"></select></label></div>
+  <div class="row sset2">
     <label><input id="hide" type="checkbox"> 부른 곡 숨기기(방송)</label>
     <button id="reset" class="danger">전체 초기화</button>
   </div>
-  <div class="row"><label>곡 목록 폰트 <select id="lf" class="fsel"></select></label></div>
   <div class="hint">Ctrl+Enter로 추가 · 대기 곡은 오른쪽 ≡를 잡고 끌어서 순서 변경</div>
 </div>
 
@@ -175,7 +179,7 @@ document.body.className = mode;
 let S = { q: [], d: [], h: [] };   // q: 대기열(q[0]=Now Playing), d: 부른 곡, h: 되돌리기 기록
 let cfg = { fs: 22, hide: false, msg: '', mfs: 30, mb: true, mc: '#ffffff',
              tt: "Today's Setlist", tfs: 40, tb: true, tc: '#ffffff',
-             ta: 'left', ma: 'left', tf: '', mf: '', lf: '', sw: DEF_SW.slice(), fold: false };
+             ta: 'left', ma: 'left', tf: '', mf: '', lf: '', sw: DEF_SW.slice(), fold: false, fold2: false };
 let drag = -1, drop = -1, lastRaw = '';
 let editId = null, editDraft = '', suppressBlur = false, lastNowId;
 
@@ -330,6 +334,8 @@ function render() {
   document.getElementById('copy').disabled = !(S.d.length || S.q.length);
   document.getElementById('panel').classList.toggle('fold', !!cfg.fold);
   document.getElementById('fold').textContent = cfg.fold ? '설정 ▾' : '설정 ▴';
+  document.getElementById('panel').classList.toggle('fold2', !!cfg.fold2);
+  document.getElementById('fold2').textContent = cfg.fold2 ? '목록 설정 ▾' : '목록 설정 ▴';
   document.getElementById('tcd').style.background = cfg.tc;
   document.getElementById('mcd').style.background = cfg.mc;
   renderPal();
@@ -660,6 +666,7 @@ window.addEventListener('scroll', closePal, true);
 window.addEventListener('resize', closePal);
 
 document.getElementById('fold').onclick = () => { cfg.fold = !cfg.fold; closePal(); save(); render(); };
+document.getElementById('fold2').onclick = () => { cfg.fold2 = !cfg.fold2; save(); render(); };
 
 load(); syncControls(); render();
 </script>
