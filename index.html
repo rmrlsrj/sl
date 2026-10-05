@@ -63,6 +63,10 @@ body.control #head{margin:0 0 10px;padding:8px 10px}
 .prow button{padding:5px 9px}
 #pedit.on{background:#1fbf6b;color:#06210f;font-weight:700}
 .phint{margin-top:8px;font-size:12px;color:#8a8d9a}
+.mrow{margin-top:14px}
+#panel.fold .sset{display:none}
+#panel.fold .mrow{margin-top:6px}
+#fold{white-space:nowrap}
 
 /* 상단 메시지 */
 #banner{display:none;padding:8px 10px 0;line-height:1.3;white-space:pre-wrap;word-break:break-all;
@@ -87,7 +91,7 @@ body.control .card{font-size:15px}
 @keyframes mq{0%,15%{transform:translateX(0)}100%{transform:translateX(-50%)}}
 .badge{font-size:.55em;font-weight:800;background:#14ed9f;color:#04251a;padding:.2em .7em;border-radius:6px}
 .empty{color:rgba(255,255,255,.55);font-weight:600}
-.done{opacity:.7}
+.done{opacity:.6}
 .done .t{text-decoration:line-through}
 .del{background:none;color:#ff9a9a;padding:2px 6px;font-size:.9em}
 .del:hover{background:rgba(255,255,255,.1)}
@@ -103,22 +107,22 @@ body.view .del,body.view .grip{display:none}
 <body>
 
 <div id="panel">
-  <div class="row" style="margin-top:0"><input id="tt" type="text" placeholder="제목 (비우면 숨김)"></div>
-  <div class="row">
+  <div class="row" style="margin-top:0"><input id="tt" type="text" placeholder="제목 (비우면 숨김)"><button id="fold" type="button" title="글자 크기·색·정렬·폰트 설정 접기/펼치기">설정 ▴</button></div>
+  <div class="row sset">
     <label>글자 <input id="tfs" type="range" min="14" max="80"></label>
     <label><input id="tb" type="checkbox"> 굵게</label>
     <button id="tcb" class="cbtn" type="button" title="글자색"><i class="cdot" id="tcd"></i>글자색</button>
     <span class="seg" id="tal"></span>
   </div>
-  <div class="row"><label>제목 폰트 <select id="tf" class="fsel"></select></label></div>
-  <div class="row" style="margin-top:14px"><input id="msg" type="text" placeholder="상단 메시지 (예: 한식 노래방~)"></div>
-  <div class="row">
+  <div class="row sset"><label>제목 폰트 <select id="tf" class="fsel"></select></label></div>
+  <div class="row mrow"><input id="msg" type="text" placeholder="상단 메시지 (예: 한식 노래방~)"></div>
+  <div class="row sset">
     <label>글자 <input id="mfs" type="range" min="14" max="72"></label>
     <label><input id="mb" type="checkbox"> 굵게</label>
     <button id="mcb" class="cbtn" type="button" title="글자색"><i class="cdot" id="mcd"></i>글자색</button>
     <span class="seg" id="mal"></span>
   </div>
-  <div class="row"><label>메시지 폰트 <select id="mf" class="fsel"></select></label></div>
+  <div class="row sset"><label>메시지 폰트 <select id="mf" class="fsel"></select></label></div>
   <hr class="sep">
   <textarea id="ta" placeholder="신청곡을 붙여넣기 (한 줄에 한 곡)"></textarea>
   <div class="row">
@@ -161,7 +165,7 @@ document.body.className = mode;
 let S = { q: [], d: [], h: [] };   // q: 대기열(q[0]=Now Playing), d: 부른 곡, h: 되돌리기 기록
 let cfg = { fs: 22, hide: false, msg: '', mfs: 30, mb: true, mc: '#ffffff',
              tt: "Today's Setlist", tfs: 40, tb: true, tc: '#ffffff',
-             ta: 'left', ma: 'left', tf: '', mf: '', lf: '', sw: DEF_SW.slice() };
+             ta: 'left', ma: 'left', tf: '', mf: '', lf: '', sw: DEF_SW.slice(), fold: false };
 let drag = -1, drop = -1, lastRaw = '';
 
 function load() {
@@ -266,6 +270,8 @@ function render() {
   document.getElementById('next').disabled = !S.q.length;
   document.getElementById('undo').disabled = !S.h.length;
   document.getElementById('copy').disabled = !(S.d.length || S.q.length);
+  document.getElementById('panel').classList.toggle('fold', !!cfg.fold);
+  document.getElementById('fold').textContent = cfg.fold ? '설정 ▾' : '설정 ▴';
   document.getElementById('tcd').style.background = cfg.tc;
   document.getElementById('mcd').style.background = cfg.mc;
   renderPal();
@@ -584,6 +590,8 @@ document.addEventListener('mousedown', e => {
 document.addEventListener('keydown', e => { if (e.key === 'Escape') closePal(); });
 window.addEventListener('scroll', closePal, true);
 window.addEventListener('resize', closePal);
+
+document.getElementById('fold').onclick = () => { cfg.fold = !cfg.fold; closePal(); save(); render(); };
 
 load(); syncControls(); render();
 </script>
