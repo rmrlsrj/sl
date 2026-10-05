@@ -60,11 +60,13 @@ body.control #title{font-size:max(14px,calc(var(--tfs)*.4px));padding:2px 2px 6p
 #msg,#tt{flex:1;min-width:140px;padding:7px 8px;border-radius:8px;border:1px solid #3a3c46;background:#12131a;color:#fff;font:inherit}
 input:disabled{opacity:.4;cursor:default}
 input[type=color]{width:34px;height:26px;padding:0;border:0;background:none;cursor:pointer}
-#head{display:none;margin:8px 8px 0;padding:10px calc(var(--cfs)*.9) 10px calc(var(--cfs)*2.7 + 12px);border-radius:14px;
+#head{--pl:calc(var(--cfs)*2.7 + 12px);--pr:calc(var(--cfs)*.9);display:none;margin:8px 8px 0;padding:10px var(--pr) 10px var(--pl);border-radius:14px;
   background:rgba(26,26,28,.90);border:1px solid rgba(255,255,255,.14)}
 #head #title,#head #banner{padding:0;text-shadow:none}
 #head #banner.sp{padding-bottom:4px}
-body.control #head{margin:0 0 10px;padding:8px 10px}
+body.control #head{--pl:10px;--pr:10px;margin:0 0 10px;padding:8px 10px}
+/* 가운데정렬: 곡 카드 줄맞춤용 왼쪽 여백을 무시하고 카드 전체 폭 기준으로 가운데 */
+#head #title.ctr,#head #banner.ctr{margin-left:calc(var(--pl)*-1);margin-right:calc(var(--pr)*-1);padding-left:var(--pr);padding-right:var(--pr)}
 .fsel{background:#12131a;color:#fff;border:1px solid #3a3c46;border-radius:8px;padding:6px;font:inherit;max-width:240px}
 .seg{display:flex;gap:2px}
 .seg button{padding:5px 9px}
@@ -361,6 +363,7 @@ function render() {
   T.style.fontWeight = cfg.tb ? '800' : '400';
   T.style.color = cfg.tc;
   T.style.textAlign = cfg.ta;
+  T.classList.toggle('ctr', cfg.ta === 'center');
   applyFont(T, cfg.tf);
   tbEl.disabled = WEB_NAMES.has(cfg.tf);
   document.querySelectorAll('#tal button').forEach(b => b.classList.toggle('on', b.dataset.a === cfg.ta));
@@ -374,6 +377,7 @@ function render() {
   B.style.color = cfg.mc;
   B.style.opacity = (cfg.bo == null ? 100 : cfg.bo) / 100;
   B.style.textAlign = cfg.ma;
+  B.classList.toggle('ctr', cfg.ma === 'center');
   applyFont(B, cfg.mf);
   mbEl.disabled = WEB_NAMES.has(cfg.mf);
   document.querySelectorAll('#mal button').forEach(b => b.classList.toggle('on', b.dataset.a === cfg.ma));
