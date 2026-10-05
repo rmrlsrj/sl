@@ -142,6 +142,13 @@ body.control .now .t{font-size:1em}
 .grip:hover{opacity:1}
 body.view .del,body.view .edt,body.view .skp,body.view .grip{display:none}
 .dragging{opacity:.35}
+/* 뷰 전용 요약 카드: 표시 개수를 넘는 대기 곡 */
+.card.more{justify-content:center;font-size:calc(var(--fs)*.8);font-weight:700;color:rgba(255,255,255,.72);padding:.4em .9em}
+/* 뷰에 보일 대기 곡 수 선택 버튼 */
+#nxs{gap:6px;flex-wrap:wrap}
+#nxs button{padding:6px 12px;background:#454859;border:1px solid #666a80;box-shadow:0 2px 0 rgba(0,0,0,.35);font-weight:600;white-space:nowrap}
+#nxs button:hover{background:#565a70;border-color:#8a8ea6}
+#nxs button.on{background:#1fbf6b;color:#06210f;border-color:#1fbf6b;font-weight:700}
 /* 대기 곡 흐림 (Now Playing·부른 곡 제외) */
 .card.wait{opacity:var(--wo,1)}
 .card.wait.editing{opacity:1}
@@ -249,6 +256,8 @@ body.neon .badge::before{content:"✦";margin-right:.4em}
       <div class="row"><label>크기 <input id="fs" type="range" min="14" max="44" step="1"></label></div>
       <div class="row"><label>대기 곡 선명도 <input id="wo" type="range" min="20" max="100" step="5"> <span id="wov" style="min-width:3em;color:#8a8d9a">100%</span></label></div>
       <div class="row"><label>폰트 <select id="lf" class="fsel"></select></label></div>
+      <div class="row"><label>뷰에 보일 대기 곡</label><span class="seg" id="nxs"></span></div>
+      <div class="hint" style="margin-top:2px">컨트롤부에는 전체가 보이고, 방송 뷰에만 적용돼요. 넘치는 곡은 "외 N곡 대기 중"으로 표시</div>
       <div class="row">
         <label><input id="hide" type="checkbox"> 부른 곡 숨기기(방송)</label>
         <button id="reset" class="danger">전체 초기화</button>
@@ -296,7 +305,7 @@ const mode = new URLSearchParams(location.search).get('mode') === 'view' ? 'view
 document.body.className = mode;
 
 let S = { q: [], d: [], h: [] };   // q: 대기열(q[0]=Now Playing), d: 부른 곡, h: 되돌리기 기록
-let cfg = { fs: 22, wo: 100, bo: 100, to: 100, hide: false, msg: '', mfs: 20, mb: false, mc: '#aeb1bd',
+let cfg = { fs: 22, wo: 100, bo: 100, to: 100, hide: false, nx: 4, msg: '', mfs: 20, mb: false, mc: '#aeb1bd',
              tt: "Today's Setlist", tfs: 40, tb: true, tc: '#ffffff',
              ta: 'left', ma: 'left', tf: '', mf: '', lf: '', sw: DEF_SW.slice(), fold: false, theme: 'classic' };
 let drag = -1, drop = -1, lastRaw = '';
@@ -408,12 +417,15 @@ function renderList() {
   L.appendChild(now);
 
   // 대기 곡
-  for (let i = 1; i < S.q.length; i++) {
+  const lim = (mode === 'view' && cfg.nx > 0) ? cfg.nx : Infinity;   // 뷰에서만 표시 개수 제한
+  const shown = Math.min(S.q.length - 1, lim);
+  for (let i = 1; i <= shown; i++) {
     const w = S.q[i];
     const c = el('div', 'card wait' + (editId === w.id ? ' editing' : '')); c.dataset.i = i;
     c.append(el('span', 'no', nd + i + 1), titleCell(w), iconBtn('edt', '제목 수정', w.id, ICO.edit), delBtn(w.id), Object.assign(el('span', 'grip'), { title: '끌어서 순서 변경' }));
     L.appendChild(c);
   }
+  if (S.q.length - 1 > shown) L.appendChild(el('div', 'card more', '외 ' + (S.q.length - 1 - shown) + '곡 대기 중'));
 
   // 부른 곡 (맨 아래, 이동 불가)
   if (!(mode === 'view' && cfg.hide)) {
@@ -434,6 +446,7 @@ function render() {
   document.body.classList.toggle('glassy', th === 'glassy');
   document.body.classList.toggle('neon', th === 'neon');
   document.querySelectorAll('#thm button').forEach(b => b.classList.toggle('on', b.dataset.t === th));
+  document.querySelectorAll('#nxs button').forEach(b => b.classList.toggle('on', +b.dataset.n === (cfg.nx || 0)));
   document.documentElement.style.setProperty('--fs', cfg.fs + 'px');
   document.documentElement.style.setProperty('--wo', (cfg.wo == null ? 100 : cfg.wo) / 100);
   document.documentElement.style.setProperty('--mfs', cfg.mfs);
@@ -463,7 +476,7 @@ function render() {
   mbEl.disabled = WEB_NAMES.has(cfg.mf);
   document.querySelectorAll('#mal button').forEach(b => b.classList.toggle('on', b.dataset.a === cfg.ma));
   // 목록은 곡·편집 상태·목록 폰트·숨김 설정이 바뀔 때만 다시 그림 (그 외 설정 변경 시 마퀴 유지)
-  const key = JSON.stringify([S.q, S.d, editId, cfg.lf, cfg.hide]);
+  const key = JSON.stringify([S.q, S.d, editId, cfg.lf, cfg.hide, cfg.nx]);
   const rebuilt = key !== listKey;
   if (rebuilt) { listKey = key; renderList(); }
 
@@ -569,6 +582,13 @@ tbEl.onchange = () => { cfg.tb = tbEl.checked; saveRender(); };
     b.onclick = () => { cfg[key] = v; saveRender(); };
     $(id).appendChild(b);
   });
+});
+
+/* 뷰에 보일 대기 곡 수: 3 / 4 / 5 / 10 / 무제한(0) */
+[[3, '3'], [4, '4'], [5, '5'], [10, '10'], [0, '무제한']].forEach(([v, label]) => {
+  const b = el('button', '', label); b.type = 'button'; b.dataset.n = v; b.title = v ? '대기 곡 ' + v + '곡까지 표시' : '대기 곡 전부 표시';
+  b.onclick = () => { cfg.nx = v; saveRender(); };
+  $('nxs').appendChild(b);
 });
 
 /* 폰트 선택 */
