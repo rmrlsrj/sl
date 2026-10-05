@@ -305,7 +305,7 @@ const mode = new URLSearchParams(location.search).get('mode') === 'view' ? 'view
 document.body.className = mode;
 
 let S = { q: [], d: [], h: [] };   // q: 대기열(q[0]=Now Playing), d: 부른 곡, h: 되돌리기 기록
-let cfg = { fs: 22, wo: 100, bo: 100, to: 100, hide: false, nx: 4, msg: '', mfs: 20, mb: false, mc: '#aeb1bd',
+let cfg = { fs: 22, wo: 100, bo: 100, to: 100, hide: true, nx: 4, msg: '', mfs: 20, mb: false, mc: '#aeb1bd',
              tt: "Today's Setlist", tfs: 40, tb: true, tc: '#ffffff',
              ta: 'left', ma: 'left', tf: '', mf: '', lf: '', sw: DEF_SW.slice(), fold: false, theme: 'classic' };
 let drag = -1, drop = -1, lastRaw = '';
