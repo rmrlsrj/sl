@@ -161,6 +161,15 @@ body.glass .badge::before{content:"\2665";margin-right:.4em}
 /* 대기 곡: 왼쪽 라벤더 띠 (box-shadow는 드래그 표시선이 쓰므로 border로 처리) */
 body.glass .card.wait{border-left:3px solid rgba(169,155,232,.60)}
 body.glass .done{border-color:rgba(169,155,232,.15)}
+/* 전체를 덮는 불투명 배경 패널(#stage): 어떤 씬 위에서도 제어부처럼 어두운 바탕 → 네온 글로우가 살아남 */
+body.glass #stage{margin:8px;padding:14px;border-radius:22px;
+  background:linear-gradient(160deg,#1f1240,#0f0a20);
+  border:1px solid rgba(169,155,232,.35);
+  box-shadow:0 0 0 1px rgba(255,111,181,.18),0 6px 24px rgba(0,0,0,.45)}
+body.control.glass #stage{margin:0}
+body.glass #head{margin:0 0 10px}
+body.glass.view #list{padding:0}
+body.glass .now{box-shadow:0 0 0 2px #ff6fb5,0 0 12px 2px rgba(255,111,181,.60),inset 0 0 20px rgba(255,111,181,.16)}
 </style>
 </head>
 <body>
@@ -224,11 +233,13 @@ body.glass .done{border-color:rgba(169,155,232,.15)}
   </div>
 </div>
 
+<div id="stage">
 <div id="head">
   <div id="banner"></div>
   <div id="title"></div>
 </div>
 <div id="list"></div>
+</div>
 <div class="row foot"><button id="copy" class="ghost">셋리스트 복사</button></div>
 
 <div id="pal">
