@@ -33,12 +33,15 @@ button.main:hover{background:#27d377}
 button.danger.arm{background:#c0392b}
 label{display:flex;align-items:center;gap:6px;color:#c8cad4}
 .hint{color:#8a8d9a;font-size:12px;margin-top:6px}
-/* 접기 */
-.mrow{margin-top:14px}
-#panel.fold .sset{display:none}
-#panel.fold .mrow{margin-top:6px}
-#fold{white-space:nowrap}
-#panel.fold2 .sset2{display:none}
+/* 설정 묶음 (접기) */
+#fold{width:100%;display:flex;justify-content:space-between;align-items:center;padding:8px 12px;font-weight:700}
+#fold .st{font-weight:400;color:#8a8d9a;font-size:12px}
+#panel.fold #settings{display:none}
+#settings{margin-top:4px}
+.sec{margin-top:12px;padding-top:10px;border-top:1px solid #33353f}
+.sec:first-child{margin-top:6px}
+.sec h3{margin:0;font-size:13px;font-weight:700;color:#c8cad4}
+.sec h3 .sd{margin-left:6px;font-weight:400;font-size:12px;color:#8a8d9a}
 #title{display:none;padding:8px 10px 0;line-height:1.2;white-space:pre-wrap;word-break:break-all;
   text-shadow:0 2px 6px rgba(0,0,0,.85),0 0 2px rgba(0,0,0,.9);font-size:calc(var(--tfs)*1px)}
 body.control #title{font-size:calc(var(--tfs)*.55px);padding:2px 2px 6px}
@@ -48,7 +51,7 @@ input[type=color]{width:34px;height:26px;padding:0;border:0;background:none;curs
 #head{display:none;margin:8px 8px 0;padding:10px 14px;border-radius:14px;
   background:rgba(26,26,28,.90);border:1px solid rgba(255,255,255,.14)}
 #head #title,#head #banner{padding:0;text-shadow:none}
-#head #title.sp{padding-bottom:8px;margin-bottom:8px;border-bottom:1px solid rgba(255,255,255,.18)}
+#head #banner.sp{padding-bottom:4px}
 body.control #head{margin:0 0 10px;padding:8px 10px}
 .fsel{background:#12131a;color:#fff;border:1px solid #3a3c46;border-radius:8px;padding:6px;font:inherit;max-width:240px}
 .seg{display:flex;gap:2px}
@@ -90,7 +93,6 @@ body.control .now .t{font-size:1em}
 .mqt{display:inline-block;white-space:nowrap;vertical-align:top;will-change:transform}
 .mqs{display:inline-block;vertical-align:top;padding-right:3em}
 .mqt.run{animation:mq var(--mqd,10s) linear infinite}
-body.control .mqt.run{animation:none}
 @keyframes mq{0%,15%{transform:translateX(0)}100%{transform:translateX(-50%)}}
 .badge{font-size:.55em;font-weight:800;background:#14ed9f;color:#04251a;padding:.2em .7em;border-radius:6px}
 .empty{color:rgba(255,255,255,.55);font-weight:600}
@@ -122,22 +124,40 @@ body.view .del,body.view .edt,body.view .skp,body.view .grip{display:none}
 <body>
 
 <div id="panel">
-  <div class="row" style="margin-top:0"><input id="tt" type="text" placeholder="제목 (비우면 숨김)"><button id="fold" type="button" title="글자 크기·색·정렬·폰트 설정 접기/펼치기">설정 ▴</button></div>
-  <div class="row sset">
-    <label>글자 <input id="tfs" type="range" min="14" max="80"></label>
-    <label><input id="tb" type="checkbox"> 굵게</label>
-    <button id="tcb" class="cbtn" type="button" title="글자색"><i class="cdot" id="tcd"></i>글자색</button>
-    <span class="seg" id="tal"></span>
+  <button id="fold" type="button" title="서브 타이틀·메인 타이틀·곡 리스트 설정 접기/펼치기"><span>설정</span><span class="st" id="foldst">접기 ▴</span></button>
+  <div id="settings">
+    <section class="sec">
+      <h3>서브 타이틀 <span class="sd">첫째 줄</span></h3>
+      <div class="row"><input id="msg" type="text" placeholder="서브 타이틀 (예: 한식 노래방~)"></div>
+      <div class="row">
+        <label>크기 <input id="mfs" type="range" min="14" max="72"></label>
+        <label><input id="mb" type="checkbox"> 굵게</label>
+        <button id="mcb" class="cbtn" type="button" title="글자색"><i class="cdot" id="mcd"></i>글자색</button>
+        <span class="seg" id="mal"></span>
+      </div>
+      <div class="row"><label>폰트 <select id="mf" class="fsel"></select></label></div>
+    </section>
+    <section class="sec">
+      <h3>메인 타이틀 <span class="sd">둘째 줄</span></h3>
+      <div class="row"><input id="tt" type="text" placeholder="메인 타이틀 (비우면 숨김)"></div>
+      <div class="row">
+        <label>크기 <input id="tfs" type="range" min="14" max="80"></label>
+        <label><input id="tb" type="checkbox"> 굵게</label>
+        <button id="tcb" class="cbtn" type="button" title="글자색"><i class="cdot" id="tcd"></i>글자색</button>
+        <span class="seg" id="tal"></span>
+      </div>
+      <div class="row"><label>폰트 <select id="tf" class="fsel"></select></label></div>
+    </section>
+    <section class="sec">
+      <h3>곡 리스트</h3>
+      <div class="row"><label>크기 <input id="fs" type="range" min="14" max="44" step="1"></label></div>
+      <div class="row"><label>폰트 <select id="lf" class="fsel"></select></label></div>
+      <div class="row">
+        <label><input id="hide" type="checkbox"> 부른 곡 숨기기(방송)</label>
+        <button id="reset" class="danger">전체 초기화</button>
+      </div>
+    </section>
   </div>
-  <div class="row sset"><label>제목 폰트 <select id="tf" class="fsel"></select></label></div>
-  <div class="row mrow"><input id="msg" type="text" placeholder="상단 메시지 (예: 한식 노래방~)"></div>
-  <div class="row sset">
-    <label>글자 <input id="mfs" type="range" min="14" max="72"></label>
-    <label><input id="mb" type="checkbox"> 굵게</label>
-    <button id="mcb" class="cbtn" type="button" title="글자색"><i class="cdot" id="mcd"></i>글자색</button>
-    <span class="seg" id="mal"></span>
-  </div>
-  <div class="row sset"><label>메시지 폰트 <select id="mf" class="fsel"></select></label></div>
   <hr class="sep">
   <textarea id="ta" placeholder="신청곡을 붙여넣기 (한 줄에 한 곡)"></textarea>
   <div class="row">
@@ -146,19 +166,12 @@ body.view .del,body.view .edt,body.view .skp,body.view .grip{display:none}
     <button id="undo">되돌리기</button>
     <button id="copy">셋리스트 복사</button>
   </div>
-  <div class="row"><button id="fold2" type="button" title="방송 글자 크기·폰트·부른 곡 숨기기·전체 초기화 접기/펼치기">목록 설정 ▴</button></div>
-  <div class="row sset2"><label>방송 글자 크기 <input id="fs" type="range" min="14" max="44" step="1"></label></div>
-  <div class="row sset2"><label>곡 목록 폰트 <select id="lf" class="fsel"></select></label></div>
-  <div class="row sset2">
-    <label><input id="hide" type="checkbox"> 부른 곡 숨기기(방송)</label>
-    <button id="reset" class="danger">전체 초기화</button>
-  </div>
   <div class="hint">Ctrl+Enter로 추가 · 대기 곡은 오른쪽 ≡를 잡고 끌어서 순서 변경</div>
 </div>
 
 <div id="head">
-  <div id="title"></div>
   <div id="banner"></div>
+  <div id="title"></div>
 </div>
 <div id="list"></div>
 
@@ -180,9 +193,9 @@ const mode = new URLSearchParams(location.search).get('mode') === 'view' ? 'view
 document.body.className = mode;
 
 let S = { q: [], d: [], h: [] };   // q: 대기열(q[0]=Now Playing), d: 부른 곡, h: 되돌리기 기록
-let cfg = { fs: 22, hide: false, msg: '', mfs: 30, mb: true, mc: '#ffffff',
+let cfg = { fs: 22, hide: false, msg: '', mfs: 20, mb: false, mc: '#aeb1bd',
              tt: "Today's Setlist", tfs: 40, tb: true, tc: '#ffffff',
-             ta: 'left', ma: 'left', tf: '', mf: '', lf: '', sw: DEF_SW.slice(), fold: false, fold2: false };
+             ta: 'left', ma: 'left', tf: '', mf: '', lf: '', sw: DEF_SW.slice(), fold: false };
 let drag = -1, drop = -1, lastRaw = '';
 let editId = null, editDraft = '', suppressBlur = false, lastNowId;
 let listKey = '', lastFs;   // 목록 재생성 판단용
@@ -242,7 +255,7 @@ function findSong(id) { return S.q.find(x => x.id === id) || S.d.find(x => x.id 
 
 /* 제목 인라인 수정: Enter 저장 · Esc 취소 · 다른 곳 클릭 시 저장 · 빈 제목이면 취소 */
 function titleCell(song) {
-  if (editId !== song.id) return el('span', 't', song.t);
+  if (editId !== song.id) { const s = el('span', 't', song.t); s.title = song.t; return s; }
   const i = el('input', 't edit'); i.type = 'text'; i.value = editDraft;
   i.oninput = () => { editDraft = i.value; };
   i.onkeydown = e => {
@@ -274,7 +287,7 @@ function renderList() {
     now.appendChild(el('div', 'badge', 'NOW PLAYING'));
     const line = el('div', 'line');
     let tc;
-    if (editing0) tc = titleCell(s0);
+    if (editing0 || mode !== 'view') tc = titleCell(s0);   // 컨트롤부: 일반 텍스트(말줄임)
     else {
       tc = el('span', 't mq'); tc.dataset.t = s0.t;
       tc.appendChild(el('span', 'mqt', s0.t));
@@ -329,7 +342,7 @@ function render() {
   B.textContent = cfg.msg;
   B.style.display = cfg.msg ? 'block' : 'none';
   $('head').style.display = (cfg.tt || cfg.msg) ? 'block' : 'none';
-  T.classList.toggle('sp', !!(cfg.tt && cfg.msg));
+  B.classList.toggle('sp', !!(cfg.tt && cfg.msg));
   B.style.fontWeight = cfg.mb ? '800' : '400';
   B.style.color = cfg.mc;
   B.style.textAlign = cfg.ma;
@@ -345,9 +358,7 @@ function render() {
   $('undo').disabled = !S.h.length;
   $('copy').disabled = !(S.d.length || S.q.length);
   $('panel').classList.toggle('fold', !!cfg.fold);
-  $('fold').textContent = cfg.fold ? '설정 ▾' : '설정 ▴';
-  $('panel').classList.toggle('fold2', !!cfg.fold2);
-  $('fold2').textContent = cfg.fold2 ? '목록 설정 ▾' : '목록 설정 ▴';
+  $('foldst').textContent = cfg.fold ? '펼치기 ▾' : '접기 ▴';
   $('tcd').style.background = cfg.tc;
   $('mcd').style.background = cfg.mc;
   renderPal();
@@ -678,7 +689,6 @@ window.addEventListener('scroll', closePal, true);
 window.addEventListener('resize', closePal);
 
 $('fold').onclick = () => { cfg.fold = !cfg.fold; closePal(); saveRender(); };
-$('fold2').onclick = () => { cfg.fold2 = !cfg.fold2; saveRender(); };
 
 load(); syncControls(); render();
 </script>
