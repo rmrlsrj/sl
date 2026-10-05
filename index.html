@@ -33,12 +33,16 @@ button.main:hover{background:#27d377}
 button.danger.arm{background:#c0392b}
 label{display:flex;align-items:center;gap:6px;color:#c8cad4}
 .hint{color:#8a8d9a;font-size:12px;margin-top:6px}
+/* 접기 */
+.mrow{margin-top:14px}
+#panel.fold .sset{display:none}
+#panel.fold .mrow{margin-top:6px}
+#fold{white-space:nowrap}
+#panel.fold2 .sset2{display:none}
 #title{display:none;padding:8px 10px 0;line-height:1.2;white-space:pre-wrap;word-break:break-all;
   text-shadow:0 2px 6px rgba(0,0,0,.85),0 0 2px rgba(0,0,0,.9);font-size:calc(var(--tfs)*1px)}
 body.control #title{font-size:calc(var(--tfs)*.55px);padding:2px 2px 6px}
 #msg,#tt{flex:1;min-width:140px;padding:7px 8px;border-radius:8px;border:1px solid #3a3c46;background:#12131a;color:#fff;font:inherit}
-.sws{display:flex;gap:5px;align-items:center}
-.sw{width:22px;height:22px;padding:0;border-radius:50%;border:2px solid #555}
 input:disabled{opacity:.4;cursor:default}
 input[type=color]{width:34px;height:26px;padding:0;border:0;background:none;cursor:pointer}
 #head{display:none;margin:8px 8px 0;padding:10px 14px;border-radius:14px;
@@ -51,6 +55,7 @@ body.control #head{margin:0 0 10px;padding:8px 10px}
 .seg button{padding:5px 9px}
 .seg button.on{background:#1fbf6b;color:#06210f;font-weight:700}
 .sep{border:0;border-top:1px solid #33353f;margin:12px 0 4px}
+/* 글자색 버튼·팔레트 */
 .cbtn{display:inline-flex;align-items:center;gap:6px;padding:5px 10px}
 .cdot{display:inline-block;width:14px;height:14px;border-radius:50%;border:2px solid rgba(255,255,255,.55);background:#fff}
 #pal{display:none;position:fixed;z-index:50;width:236px;padding:10px;border-radius:12px;background:#24262f;border:1px solid #4a4d5a;box-shadow:0 8px 24px rgba(0,0,0,.5)}
@@ -63,13 +68,6 @@ body.control #head{margin:0 0 10px;padding:8px 10px}
 .prow button{padding:5px 9px}
 #pedit.on{background:#1fbf6b;color:#06210f;font-weight:700}
 .phint{margin-top:8px;font-size:12px;color:#8a8d9a}
-.mrow{margin-top:14px}
-#panel.fold .sset{display:none}
-#panel.fold .mrow{margin-top:6px}
-#fold{white-space:nowrap}
-#panel.fold2 .sset2{display:none}
-.edt+.skp,.skp+.del,.edt+.del{margin-left:-10px}
-body.control .now .t{font-size:1em}
 
 /* 상단 메시지 */
 #banner{display:none;padding:8px 10px 0;line-height:1.3;white-space:pre-wrap;word-break:break-all;
@@ -87,6 +85,7 @@ body.control .card{font-size:15px}
 .now{flex-direction:column;align-items:flex-start;gap:.4em;padding:.8em .9em}
 .now .line{display:flex;align-items:center;gap:12px;width:100%}
 .now .t{font-size:1.7em}
+body.control .now .t{font-size:1em}
 /* Now Playing 마퀴: 넘칠 때만 .run 적용 */
 .mqt{display:inline-block;white-space:nowrap;vertical-align:top;will-change:transform}
 .mqs{display:inline-block;vertical-align:top;padding-right:3em}
@@ -96,12 +95,14 @@ body.control .card{font-size:15px}
 .empty{color:rgba(255,255,255,.55);font-weight:600}
 .done{opacity:.6}
 .done .t{text-decoration:line-through}
+/* 카드 버튼 · 인라인 수정 · 전환 효과 */
 .del{background:none;color:#ff9a9a;padding:2px 6px;font-size:.9em}
 .del:hover{background:rgba(255,255,255,.1)}
 .edt,.skp{background:none;color:#c8cad4;padding:2px 6px;font-size:.9em}
 .edt:hover,.skp:hover{background:rgba(255,255,255,.1)}
 .skp:disabled:hover{background:none}
 .edt svg,.skp svg{display:block;width:1.15em;height:1.15em}
+.edt+.skp,.skp+.del,.edt+.del{margin-left:-10px}
 .edit{flex:1;min-width:0;font:inherit;font-weight:var(--w,700);line-height:1.3;color:#fff;background:#12131a;border:1px solid #4da3ff;border-radius:6px;padding:.1em .4em}
 .edit:focus{outline:none;border-color:#7fd6ff}
 .done .edit{text-decoration:none}
@@ -173,6 +174,7 @@ body.view .del,body.view .edt,body.view .skp,body.view .grip{display:none}
 <script>
 const K = 'setlist.v1', C = 'setlist.cfg';
 const DEF_SW = ['#ffffff', '#ffe14d', '#ff8fb8', '#7fd6ff', '#8cf29a', '#ffab5e'];
+const $ = id => document.getElementById(id);
 const mode = new URLSearchParams(location.search).get('mode') === 'view' ? 'view' : 'control';
 document.body.className = mode;
 
@@ -182,6 +184,7 @@ let cfg = { fs: 22, hide: false, msg: '', mfs: 30, mb: true, mc: '#ffffff',
              ta: 'left', ma: 'left', tf: '', mf: '', lf: '', sw: DEF_SW.slice(), fold: false, fold2: false };
 let drag = -1, drop = -1, lastRaw = '';
 let editId = null, editDraft = '', suppressBlur = false, lastNowId;
+let listKey = '', lastFs;   // 목록 재생성 판단용
 
 function load() {
   try {
@@ -210,8 +213,9 @@ function save() {
 function commit(fn) {
   S.h.push(JSON.stringify({ q: S.q, d: S.d }));
   if (S.h.length > 30) S.h.shift();
-  fn(); save(); render();
+  fn(); saveRender();
 }
+function saveRender() { save(); render(); }
 const uid = () => Date.now().toString(36) + Math.random().toString(36).slice(2, 6);
 function el(tag, cls, text) {
   const e = document.createElement(tag);
@@ -255,31 +259,8 @@ function finishEdit(saveIt) {
   else render();
 }
 
-function render() {
-  document.documentElement.style.setProperty('--fs', cfg.fs + 'px');
-  document.documentElement.style.setProperty('--mfs', cfg.mfs);
-  document.documentElement.style.setProperty('--tfs', cfg.tfs);
-  const T = document.getElementById('title');
-  T.textContent = cfg.tt;
-  T.style.display = cfg.tt ? 'block' : 'none';
-  T.style.fontWeight = cfg.tb ? '800' : '400';
-  T.style.color = cfg.tc;
-  T.style.textAlign = cfg.ta;
-  applyFont(T, cfg.tf);
-  tbEl.disabled = WEB_NAMES.has(cfg.tf);
-  document.querySelectorAll('#tal button').forEach(b => b.classList.toggle('on', b.dataset.a === cfg.ta));
-  const B = document.getElementById('banner');
-  B.textContent = cfg.msg;
-  B.style.display = cfg.msg ? 'block' : 'none';
-  document.getElementById('head').style.display = (cfg.tt || cfg.msg) ? 'block' : 'none';
-  T.classList.toggle('sp', !!(cfg.tt && cfg.msg));
-  B.style.fontWeight = cfg.mb ? '800' : '400';
-  B.style.color = cfg.mc;
-  B.style.textAlign = cfg.ma;
-  applyFont(B, cfg.mf);
-  mbEl.disabled = WEB_NAMES.has(cfg.mf);
-  document.querySelectorAll('#mal button').forEach(b => b.classList.toggle('on', b.dataset.a === cfg.ma));
-  const L = document.getElementById('list');
+function renderList() {
+  const L = $('list');
   suppressBlur = true; L.textContent = ''; suppressBlur = false;
   applyFont(L, cfg.lf);
   const nd = S.d.length;
@@ -328,18 +309,48 @@ function render() {
 
   const ei = L.querySelector('.edit');
   if (ei) { ei.focus(); const n = ei.value.length; ei.setSelectionRange(n, n); }
+}
 
-  document.getElementById('next').disabled = !S.q.length;
-  document.getElementById('undo').disabled = !S.h.length;
-  document.getElementById('copy').disabled = !(S.d.length || S.q.length);
-  document.getElementById('panel').classList.toggle('fold', !!cfg.fold);
-  document.getElementById('fold').textContent = cfg.fold ? '설정 ▾' : '설정 ▴';
-  document.getElementById('panel').classList.toggle('fold2', !!cfg.fold2);
-  document.getElementById('fold2').textContent = cfg.fold2 ? '목록 설정 ▾' : '목록 설정 ▴';
-  document.getElementById('tcd').style.background = cfg.tc;
-  document.getElementById('mcd').style.background = cfg.mc;
+function render() {
+  document.documentElement.style.setProperty('--fs', cfg.fs + 'px');
+  document.documentElement.style.setProperty('--mfs', cfg.mfs);
+  document.documentElement.style.setProperty('--tfs', cfg.tfs);
+  const T = $('title');
+  T.textContent = cfg.tt;
+  T.style.display = cfg.tt ? 'block' : 'none';
+  T.style.fontWeight = cfg.tb ? '800' : '400';
+  T.style.color = cfg.tc;
+  T.style.textAlign = cfg.ta;
+  applyFont(T, cfg.tf);
+  tbEl.disabled = WEB_NAMES.has(cfg.tf);
+  document.querySelectorAll('#tal button').forEach(b => b.classList.toggle('on', b.dataset.a === cfg.ta));
+  const B = $('banner');
+  B.textContent = cfg.msg;
+  B.style.display = cfg.msg ? 'block' : 'none';
+  $('head').style.display = (cfg.tt || cfg.msg) ? 'block' : 'none';
+  T.classList.toggle('sp', !!(cfg.tt && cfg.msg));
+  B.style.fontWeight = cfg.mb ? '800' : '400';
+  B.style.color = cfg.mc;
+  B.style.textAlign = cfg.ma;
+  applyFont(B, cfg.mf);
+  mbEl.disabled = WEB_NAMES.has(cfg.mf);
+  document.querySelectorAll('#mal button').forEach(b => b.classList.toggle('on', b.dataset.a === cfg.ma));
+  // 목록은 곡·편집 상태·목록 폰트·숨김 설정이 바뀔 때만 다시 그림 (그 외 설정 변경 시 마퀴 유지)
+  const key = JSON.stringify([S.q, S.d, editId, cfg.lf, cfg.hide]);
+  const rebuilt = key !== listKey;
+  if (rebuilt) { listKey = key; renderList(); }
+
+  $('next').disabled = !S.q.length;
+  $('undo').disabled = !S.h.length;
+  $('copy').disabled = !(S.d.length || S.q.length);
+  $('panel').classList.toggle('fold', !!cfg.fold);
+  $('fold').textContent = cfg.fold ? '설정 ▾' : '설정 ▴';
+  $('panel').classList.toggle('fold2', !!cfg.fold2);
+  $('fold2').textContent = cfg.fold2 ? '목록 설정 ▾' : '목록 설정 ▴';
+  $('tcd').style.background = cfg.tc;
+  $('mcd').style.background = cfg.mc;
   renderPal();
-  fitMarquee();
+  if (rebuilt || cfg.fs !== lastFs) { lastFs = cfg.fs; fitMarquee(); }
 }
 
 /* Now Playing 마퀴: 제목이 넘칠 때만 끊김 없이 흘러가게 함 */
@@ -366,7 +377,7 @@ if (document.fonts) {
 
 /* 조작부 이벤트 */
 function addSongs() {
-  const ta = document.getElementById('ta');
+  const ta = $('ta');
   const songs = ta.value.split(/\r?\n/)
     .map(l => l.trim().replace(/^\d+\s*[.)]\s*/, '').trim())
     .filter(Boolean);
@@ -374,40 +385,40 @@ function addSongs() {
   commit(() => songs.forEach(t => S.q.push({ id: uid(), t })));
   ta.value = '';
 }
-document.getElementById('add').onclick = addSongs;
-document.getElementById('ta').addEventListener('keydown', e => {
+$('add').onclick = addSongs;
+$('ta').addEventListener('keydown', e => {
   if (e.ctrlKey && e.key === 'Enter') addSongs();
 });
-document.getElementById('next').onclick = () => {
+$('next').onclick = () => {
   if (!S.q.length) return;
   commit(() => S.d.push(S.q.shift()));
 };
-document.getElementById('undo').onclick = () => {
+$('undo').onclick = () => {
   if (!S.h.length) return;
   const p = JSON.parse(S.h.pop());
-  S.q = p.q; S.d = p.d; save(); render();
+  S.q = p.q; S.d = p.d; saveRender();
 };
-const fsEl = document.getElementById('fs'), hideEl = document.getElementById('hide');
-fsEl.oninput = () => { cfg.fs = +fsEl.value; save(); render(); };
-hideEl.onchange = () => { cfg.hide = hideEl.checked; save(); render(); };
+const fsEl = $('fs'), hideEl = $('hide');
+fsEl.oninput = () => { cfg.fs = +fsEl.value; saveRender(); };
+hideEl.onchange = () => { cfg.hide = hideEl.checked; saveRender(); };
 
-const msgEl = document.getElementById('msg'), mfsEl = document.getElementById('mfs'),
-      mbEl = document.getElementById('mb');
-msgEl.oninput = () => { cfg.msg = msgEl.value; save(); render(); };
-mfsEl.oninput = () => { cfg.mfs = +mfsEl.value; save(); render(); };
-mbEl.onchange = () => { cfg.mb = mbEl.checked; save(); render(); };
+const msgEl = $('msg'), mfsEl = $('mfs'),
+      mbEl = $('mb');
+msgEl.oninput = () => { cfg.msg = msgEl.value; saveRender(); };
+mfsEl.oninput = () => { cfg.mfs = +mfsEl.value; saveRender(); };
+mbEl.onchange = () => { cfg.mb = mbEl.checked; saveRender(); };
 
-const ttEl = document.getElementById('tt'), tfsEl = document.getElementById('tfs'),
-      tbEl = document.getElementById('tb');
-ttEl.oninput = () => { cfg.tt = ttEl.value; save(); render(); };
-tfsEl.oninput = () => { cfg.tfs = +tfsEl.value; save(); render(); };
-tbEl.onchange = () => { cfg.tb = tbEl.checked; save(); render(); };
+const ttEl = $('tt'), tfsEl = $('tfs'),
+      tbEl = $('tb');
+ttEl.oninput = () => { cfg.tt = ttEl.value; saveRender(); };
+tfsEl.oninput = () => { cfg.tfs = +tfsEl.value; saveRender(); };
+tbEl.onchange = () => { cfg.tb = tbEl.checked; saveRender(); };
 
 [['tal', 'ta'], ['mal', 'ma']].forEach(([id, key]) => {
   [['left', '좌'], ['center', '중'], ['right', '우']].forEach(([v, label]) => {
     const b = el('button', '', label); b.dataset.a = v; b.title = label + ' 정렬';
-    b.onclick = () => { cfg[key] = v; save(); render(); };
-    document.getElementById(id).appendChild(b);
+    b.onclick = () => { cfg[key] = v; saveRender(); };
+    $(id).appendChild(b);
   });
 });
 
@@ -453,7 +464,7 @@ const FKEYS = ['tf', 'mf', 'lf'];
 function fillSelects() {
   if (mode !== 'control') return;
   FKEYS.forEach(key => {
-    const sel = document.getElementById(key);
+    const sel = $(key);
     sel.textContent = '';
     const o0 = el('option', '', '기본 글꼴'); o0.value = ''; sel.appendChild(o0);
     WEB_GROUPS.forEach(([gname, items]) => {
@@ -477,11 +488,11 @@ function fillSelects() {
   });
 }
 FKEYS.forEach(key => {
-  document.getElementById(key).onchange = e => { cfg[key] = e.target.value; save(); render(); };
+  $(key).onchange = e => { cfg[key] = e.target.value; saveRender(); };
 });
 
 let armTimer = 0;
-const resetBtn = document.getElementById('reset');
+const resetBtn = $('reset');
 resetBtn.onclick = () => {
   if (!resetBtn.classList.contains('arm')) {
     resetBtn.classList.add('arm'); resetBtn.textContent = '정말 초기화? (다시 클릭)';
@@ -496,7 +507,7 @@ function disarm() {
 }
 
 /* 삭제 */
-document.getElementById('list').addEventListener('click', e => {
+$('list').addEventListener('click', e => {
   const b = e.target.closest('.del, .edt, .skp');
   if (!b || b.disabled) return;
   const id = b.dataset.id;
@@ -513,7 +524,7 @@ document.getElementById('list').addEventListener('click', e => {
 });
 
 /* 드래그로 순서 변경 (대기 곡만) */
-const L = document.getElementById('list');
+const L = $('list');
 function clearMarks() { L.querySelectorAll('.before,.after').forEach(n => n.classList.remove('before', 'after')); }
 L.addEventListener('mousedown', e => {
   const g = e.target.closest('.grip');
@@ -550,7 +561,7 @@ L.addEventListener('drop', e => {
     if (to !== from) commit(() => { const [x] = S.q.splice(from, 1); S.q.splice(to, 0, x); });
   }
 });
-L.addEventListener('dragend', () => { drag = -1; drop = -1; render(); });
+L.addEventListener('dragend', () => { drag = -1; drop = -1; listKey = ''; render(); });
 
 /* 동기화: storage 이벤트 + 1초 폴링(안전장치) */
 function sync() {
@@ -587,7 +598,7 @@ function copyText(t) {
   }
   try { legacyCopy(t); return Promise.resolve(); } catch (e) { return Promise.reject(e); }
 }
-const copyBtn = document.getElementById('copy');
+const copyBtn = $('copy');
 let copyTimer = 0;
 function flashCopy(msg) {
   clearTimeout(copyTimer);
@@ -602,9 +613,9 @@ copyBtn.onclick = () => {
 };
 
 /* 글자색 팔레트: 6칸 공유, 적용은 제목/메시지 각각 */
-const pal = document.getElementById('pal'), pslots = document.getElementById('pslots'),
-      pcol = document.getElementById('pcol'), pedit = document.getElementById('pedit'),
-      prst = document.getElementById('prst'), phint = document.getElementById('phint');
+const pal = $('pal'), pslots = $('pslots'),
+      pcol = $('pcol'), pedit = $('pedit'),
+      prst = $('prst'), phint = $('phint');
 let palTarget = null, palEdit = false, prstTimer = 0;
 function renderPal() {
   if (palTarget === null) return;
@@ -636,19 +647,19 @@ function closePal() {
 function disarmPrst() {
   clearTimeout(prstTimer); delete prst.dataset.arm; prst.textContent = '기본색 복원';
 }
-document.getElementById('tcb').onclick = e => openPal('tc', e.currentTarget);
-document.getElementById('mcb').onclick = e => openPal('mc', e.currentTarget);
+$('tcb').onclick = e => openPal('tc', e.currentTarget);
+$('mcb').onclick = e => openPal('mc', e.currentTarget);
 pslots.onclick = e => {
   const b = e.target.closest('.pslot');
   if (!b || palTarget === null) return;
   const i = +b.dataset.i;
   if (palEdit) { cfg.sw[i] = cfg[palTarget].toLowerCase(); palEdit = false; }
   else cfg[palTarget] = cfg.sw[i];
-  save(); render();
+  saveRender();
 };
 pcol.oninput = () => {
   if (palTarget === null) return;
-  cfg[palTarget] = pcol.value; save(); render();
+  cfg[palTarget] = pcol.value; saveRender();
 };
 pedit.onclick = () => { palEdit = !palEdit; renderPal(); };
 prst.onclick = () => {
@@ -656,7 +667,7 @@ prst.onclick = () => {
     prst.dataset.arm = '1'; prst.textContent = '한 번 더 누르면 복원';
     prstTimer = setTimeout(disarmPrst, 3000); return;
   }
-  disarmPrst(); cfg.sw = DEF_SW.slice(); save(); render();
+  disarmPrst(); cfg.sw = DEF_SW.slice(); saveRender();
 };
 document.addEventListener('mousedown', e => {
   if (pal.classList.contains('open') && !e.target.closest('#pal, .cbtn')) closePal();
@@ -665,8 +676,8 @@ document.addEventListener('keydown', e => { if (e.key === 'Escape') closePal(); 
 window.addEventListener('scroll', closePal, true);
 window.addEventListener('resize', closePal);
 
-document.getElementById('fold').onclick = () => { cfg.fold = !cfg.fold; closePal(); save(); render(); };
-document.getElementById('fold2').onclick = () => { cfg.fold2 = !cfg.fold2; save(); render(); };
+$('fold').onclick = () => { cfg.fold = !cfg.fold; closePal(); saveRender(); };
+$('fold2').onclick = () => { cfg.fold2 = !cfg.fold2; saveRender(); };
 
 load(); syncControls(); render();
 </script>
