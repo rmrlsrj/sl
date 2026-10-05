@@ -131,6 +131,10 @@ body.control .now .t{font-size:1em}
 .grip:hover{opacity:1}
 body.view .del,body.view .edt,body.view .skp,body.view .grip{display:none}
 .dragging{opacity:.35}
+/* 대기 곡 흐림 (Now Playing·부른 곡 제외) */
+.card.wait{opacity:var(--wo,1)}
+.card.wait.editing{opacity:1}
+.card.wait.dragging{opacity:.35}
 .wait.before{box-shadow:0 -4px 0 0 #4da3ff}
 .wait.after{box-shadow:0 4px 0 0 #4da3ff}
 </style>
@@ -165,6 +169,7 @@ body.view .del,body.view .edt,body.view .skp,body.view .grip{display:none}
     <section class="sec">
       <h3>곡 리스트</h3>
       <div class="row"><label>크기 <input id="fs" type="range" min="14" max="44" step="1"></label></div>
+      <div class="row"><label>대기 곡 선명도 <input id="wo" type="range" min="20" max="100" step="5"> <span id="wov" style="min-width:3em;color:#8a8d9a">100%</span></label></div>
       <div class="row"><label>폰트 <select id="lf" class="fsel"></select></label></div>
       <div class="row">
         <label><input id="hide" type="checkbox"> 부른 곡 숨기기(방송)</label>
@@ -211,7 +216,7 @@ const mode = new URLSearchParams(location.search).get('mode') === 'view' ? 'view
 document.body.className = mode;
 
 let S = { q: [], d: [], h: [] };   // q: 대기열(q[0]=Now Playing), d: 부른 곡, h: 되돌리기 기록
-let cfg = { fs: 22, hide: false, msg: '', mfs: 20, mb: false, mc: '#aeb1bd',
+let cfg = { fs: 22, wo: 100, hide: false, msg: '', mfs: 20, mb: false, mc: '#aeb1bd',
              tt: "Today's Setlist", tfs: 40, tb: true, tc: '#ffffff',
              ta: 'left', ma: 'left', tf: '', mf: '', lf: '', sw: DEF_SW.slice(), fold: false };
 let drag = -1, drop = -1, lastRaw = '';
@@ -345,6 +350,7 @@ function renderList() {
 
 function render() {
   document.documentElement.style.setProperty('--fs', cfg.fs + 'px');
+  document.documentElement.style.setProperty('--wo', (cfg.wo == null ? 100 : cfg.wo) / 100);
   document.documentElement.style.setProperty('--mfs', cfg.mfs);
   document.documentElement.style.setProperty('--tfs', cfg.tfs);
   const T = $('title');
@@ -428,8 +434,9 @@ $('undo').onclick = () => {
   const p = JSON.parse(S.h.pop());
   S.q = p.q; S.d = p.d; saveRender();
 };
-const fsEl = $('fs'), hideEl = $('hide');
+const fsEl = $('fs'), hideEl = $('hide'), woEl = $('wo'), wovEl = $('wov');
 fsEl.oninput = () => { cfg.fs = +fsEl.value; saveRender(); };
+woEl.oninput = () => { cfg.wo = +woEl.value; wovEl.textContent = cfg.wo + '%'; saveRender(); };
 hideEl.onchange = () => { cfg.hide = hideEl.checked; saveRender(); };
 
 const msgEl = $('msg'), mfsEl = $('mfs'),
@@ -604,6 +611,7 @@ setInterval(sync, 1000);
 
 function syncControls() {
   fsEl.value = cfg.fs; hideEl.checked = cfg.hide;
+  woEl.value = cfg.wo == null ? 100 : cfg.wo; wovEl.textContent = woEl.value + '%';
   if (document.activeElement !== msgEl) msgEl.value = cfg.msg;
   mfsEl.value = cfg.mfs; mbEl.checked = cfg.mb;
   if (document.activeElement !== ttEl) ttEl.value = cfg.tt;
