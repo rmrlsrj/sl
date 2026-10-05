@@ -15,6 +15,8 @@
 *{box-sizing:border-box}
 html,body{margin:0}
 body{font-family:'Pretendard','Noto Sans KR','Malgun Gothic',sans-serif;color:#fff}
+body{--cfs:var(--fs)}   /* 곡 카드 글자 크기: 타이틀 줄맞춤 계산용 */
+body.control{--cfs:15px}
 body.view{background:transparent;overflow:hidden}
 body.control{background:#1c1d23;font-size:14px;padding:10px}
 body.view #panel,body.view #dock,body.view .foot{display:none}
@@ -58,11 +60,11 @@ body.control #title{font-size:calc(var(--tfs)*.55px);padding:2px 2px 6px}
 #msg,#tt{flex:1;min-width:140px;padding:7px 8px;border-radius:8px;border:1px solid #3a3c46;background:#12131a;color:#fff;font:inherit}
 input:disabled{opacity:.4;cursor:default}
 input[type=color]{width:34px;height:26px;padding:0;border:0;background:none;cursor:pointer}
-#head{display:none;margin:8px 8px 0;padding:10px 14px;border-radius:14px;
+#head{display:none;margin:8px 8px 0;padding:10px calc(var(--cfs)*.9) 10px calc(var(--cfs)*2.7 + 12px);border-radius:14px;
   background:rgba(26,26,28,.90);border:1px solid rgba(255,255,255,.14)}
 #head #title,#head #banner{padding:0;text-shadow:none}
 #head #banner.sp{padding-bottom:4px}
-body.control #head{margin:0 0 10px;padding:8px 10px}
+body.control #head{margin:0 0 10px;padding:8px calc(var(--cfs)*.9) 8px calc(var(--cfs)*2.7 + 12px)}
 .fsel{background:#12131a;color:#fff;border:1px solid #3a3c46;border-radius:8px;padding:6px;font:inherit;max-width:240px}
 .seg{display:flex;gap:2px}
 .seg button{padding:5px 9px}
