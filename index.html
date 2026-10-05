@@ -133,6 +133,22 @@ body.view .del,body.view .edt,body.view .skp,body.view .grip{display:none}
 .dragging{opacity:.35}
 .wait.before{box-shadow:0 -4px 0 0 #4da3ff}
 .wait.after{box-shadow:0 4px 0 0 #4da3ff}
+/* 시안 B: 중앙형 (뷰 전용). 위계는 크기·글자 농도·카드 폭으로만 만듦 (카드 배경은 모두 동일) */
+#list.cen{align-items:center;gap:8px}
+.cen .card{width:100%}
+.cen .cb{justify-content:center;padding:.5em .9em}
+.cen .cb .t,.cen .now .t{flex:0 1 auto;text-align:center}
+.cen .c1{width:92%;font-size:calc(var(--fs)*1.2)}   /* 1칸 이웃 글자 크기 */
+.cen .c2{width:84%;font-size:var(--fs)}              /* 2칸 이웃 글자 크기 */
+.cen .done{opacity:1}
+.cen .cb.done.c1 .t{color:rgba(255,255,255,.70)}     /* 부른 곡: 취소선 + 더 흐리게 */
+.cen .cb.done.c2 .t{color:rgba(255,255,255,.45)}
+.cen .cb.nx.c1 .t{color:rgba(255,255,255,.85)}       /* 부를 곡: 취소선 없이 더 선명하게 */
+.cen .cb.nx.c2 .t{color:rgba(255,255,255,.60)}
+.cen .now{align-items:center}
+.cen .now .badge{margin-left:0}
+.cen .now .line{justify-content:center}
+.cen .empty{width:100%;text-align:center}
 </style>
 </head>
 <body>
@@ -166,8 +182,16 @@ body.view .del,body.view .edt,body.view .skp,body.view .grip{display:none}
       <h3>곡 리스트</h3>
       <div class="row"><label>크기 <input id="fs" type="range" min="14" max="44" step="1"></label></div>
       <div class="row"><label>폰트 <select id="lf" class="fsel"></select></label></div>
+      <div class="row"><label>뷰 모양</label><span class="seg" id="lay"></span></div>
+      <div class="row" id="brow">
+        <label>중앙형 표시</label>
+        <label><input id="bu2" type="checkbox"> 위 2</label>
+        <label><input id="bu1" type="checkbox"> 위 1</label>
+        <label><input id="bd1" type="checkbox"> 아래 1</label>
+        <label><input id="bd2" type="checkbox"> 아래 2</label>
+      </div>
       <div class="row">
-        <label><input id="hide" type="checkbox"> 부른 곡 숨기기(방송)</label>
+        <label title="목록형(A)에서만 적용돼요. 중앙형(B)은 위 1·위 2 표시로 조절"><input id="hide" type="checkbox"> 부른 곡 숨기기(방송)</label>
         <button id="reset" class="danger">전체 초기화</button>
       </div>
     </section>
@@ -213,7 +237,8 @@ document.body.className = mode;
 let S = { q: [], d: [], h: [] };   // q: 대기열(q[0]=Now Playing), d: 부른 곡, h: 되돌리기 기록
 let cfg = { fs: 22, hide: false, msg: '', mfs: 20, mb: false, mc: '#aeb1bd',
              tt: "Today's Setlist", tfs: 40, tb: true, tc: '#ffffff',
-             ta: 'left', ma: 'left', tf: '', mf: '', lf: '', sw: DEF_SW.slice(), fold: false };
+             ta: 'left', ma: 'left', tf: '', mf: '', lf: '', sw: DEF_SW.slice(), fold: false,
+             lay: 'a', bu2: true, bu1: true, bd1: true, bd2: true };
 let drag = -1, drop = -1, lastRaw = '';
 let editId = null, editDraft = '', suppressBlur = false, lastNowId;
 let listKey = '', lastFs;   // 목록 재생성 판단용
@@ -291,11 +316,18 @@ function finishEdit(saveIt) {
   else render();
 }
 
+function cenCard(song, lvl, kind) {   // 중앙형 이웃 카드: 번호 없이 제목만
+  const c = el('div', 'card cb c' + lvl + ' ' + kind);
+  c.appendChild(titleCell(song));
+  return c;
+}
 function renderList() {
   const L = $('list');
   suppressBlur = true; L.textContent = ''; suppressBlur = false;
   applyFont(L, cfg.lf);
   const nd = S.d.length;
+  const cen = mode === 'view' && cfg.lay === 'b';   // 시안 B(중앙형)는 뷰에서만
+  L.classList.toggle('cen', cen);
 
   // Now Playing
   const now = el('div', 'card now');
@@ -312,13 +344,26 @@ function renderList() {
     }
     const skp = iconBtn('skp', '맨 뒤로 보내기', s0.id, ICO.skip);
     skp.disabled = S.q.length < 2;
-    line.append(el('span', 'no', nd + 1), tc, iconBtn('edt', '제목 수정', s0.id, ICO.edit), skp, delBtn(s0.id));
+    if (cen) line.append(tc);
+    else line.append(el('span', 'no', nd + 1), tc, iconBtn('edt', '제목 수정', s0.id, ICO.edit), skp, delBtn(s0.id));
     now.appendChild(line);
     if (lastNowId !== undefined && lastNowId !== s0.id) now.classList.add('swap');
     lastNowId = s0.id;
   } else {
     now.appendChild(el('div', 'empty', S.d.length ? '모든 곡을 불렀어요' : '신청곡을 추가해 주세요'));
     lastNowId = null;
+  }
+  if (cen) {   // 중앙형: 위(부른 곡) → 지금 곡 → 아래(부를 곡), 각각 켜진 칸만 표시
+    [[2, cfg.bu2], [1, cfg.bu1]].forEach(([k, on]) => {
+      const sg = S.d[S.d.length - k];
+      if (on && sg) L.appendChild(cenCard(sg, k, 'done'));
+    });
+    L.appendChild(now);
+    [[1, cfg.bd1], [2, cfg.bd2]].forEach(([k, on]) => {
+      const sg = S.q[k];
+      if (on && sg) L.appendChild(cenCard(sg, k, 'nx'));
+    });
+    return;
   }
   L.appendChild(now);
 
@@ -368,10 +413,13 @@ function render() {
   mbEl.disabled = WEB_NAMES.has(cfg.mf);
   document.querySelectorAll('#mal button').forEach(b => b.classList.toggle('on', b.dataset.a === cfg.ma));
   // 목록은 곡·편집 상태·목록 폰트·숨김 설정이 바뀔 때만 다시 그림 (그 외 설정 변경 시 마퀴 유지)
-  const key = JSON.stringify([S.q, S.d, editId, cfg.lf, cfg.hide]);
+  const key = JSON.stringify([S.q, S.d, editId, cfg.lf, cfg.hide, cfg.lay, cfg.bu2, cfg.bu1, cfg.bd1, cfg.bd2]);
   const rebuilt = key !== listKey;
   if (rebuilt) { listKey = key; renderList(); }
 
+  document.querySelectorAll('#lay button').forEach(b => b.classList.toggle('on', b.dataset.a === cfg.lay));
+  $('brow').style.display = cfg.lay === 'b' ? '' : 'none';
+  hideEl.disabled = cfg.lay === 'b';
   $('next').disabled = !S.q.length;
   $('undo').disabled = !S.h.length;
   $('copy').disabled = !(S.d.length || S.q.length);
@@ -431,6 +479,15 @@ $('undo').onclick = () => {
 const fsEl = $('fs'), hideEl = $('hide');
 fsEl.oninput = () => { cfg.fs = +fsEl.value; saveRender(); };
 hideEl.onchange = () => { cfg.hide = hideEl.checked; saveRender(); };
+
+[['a', '목록형 (A)'], ['b', '중앙형 (B)']].forEach(([v, label]) => {
+  const b = el('button', '', label); b.type = 'button'; b.dataset.a = v;
+  b.onclick = () => { cfg.lay = v; saveRender(); };
+  $('lay').appendChild(b);
+});
+['bu2', 'bu1', 'bd1', 'bd2'].forEach(k => {
+  $(k).onchange = () => { cfg[k] = $(k).checked; saveRender(); };
+});
 
 const msgEl = $('msg'), mfsEl = $('mfs'),
       mbEl = $('mb');
@@ -604,6 +661,7 @@ setInterval(sync, 1000);
 
 function syncControls() {
   fsEl.value = cfg.fs; hideEl.checked = cfg.hide;
+  ['bu2', 'bu1', 'bd1', 'bd2'].forEach(k => { $(k).checked = !!cfg[k]; });
   if (document.activeElement !== msgEl) msgEl.value = cfg.msg;
   mfsEl.value = cfg.mfs; mbEl.checked = cfg.mb;
   if (document.activeElement !== ttEl) ttEl.value = cfg.tt;
