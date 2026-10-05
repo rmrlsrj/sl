@@ -21,7 +21,9 @@ body.view #panel{display:none}
 
 /* 조작부 */
 #panel{margin-bottom:12px}
-#ta{width:100%;height:84px;resize:vertical;padding:8px;border-radius:8px;border:1px solid #3a3c46;background:#12131a;color:#fff;font:inherit}
+#ta{width:100%;height:84px;resize:vertical;padding:8px;border-radius:8px;border:1px solid #e3cf83;background:#fff4c7;color:#2a2618;font:inherit}
+#ta::placeholder{color:#8a826a}
+#ta:focus{outline:2px solid #e0b93a;outline-offset:0}
 .row{display:flex;gap:6px;flex-wrap:wrap;align-items:center;margin-top:6px}
 button{font:inherit;cursor:pointer;border:0;border-radius:8px;padding:7px 12px;background:#33353f;color:#fff}
 button:hover{background:#40424e}
@@ -49,6 +51,18 @@ body.control #head{margin:0 0 10px;padding:8px 10px}
 .seg button{padding:5px 9px}
 .seg button.on{background:#1fbf6b;color:#06210f;font-weight:700}
 .sep{border:0;border-top:1px solid #33353f;margin:12px 0 4px}
+.cbtn{display:inline-flex;align-items:center;gap:6px;padding:5px 10px}
+.cdot{display:inline-block;width:14px;height:14px;border-radius:50%;border:2px solid rgba(255,255,255,.55);background:#fff}
+#pal{display:none;position:fixed;z-index:50;width:236px;padding:10px;border-radius:12px;background:#24262f;border:1px solid #4a4d5a;box-shadow:0 8px 24px rgba(0,0,0,.5)}
+#pal.open{display:block}
+.pslots{display:grid;grid-template-columns:repeat(6,1fr);gap:6px}
+.pslot{width:100%;aspect-ratio:1;padding:0;border-radius:50%;border:2px solid #555}
+.pslot.on{border-color:#fff}
+#pal.edit .pslot{border:2px dashed #ffe14d}
+.prow{display:flex;gap:6px;align-items:center;flex-wrap:wrap;margin-top:10px}
+.prow button{padding:5px 9px}
+#pedit.on{background:#1fbf6b;color:#06210f;font-weight:700}
+.phint{margin-top:8px;font-size:12px;color:#8a8d9a}
 
 /* 상단 메시지 */
 #banner{display:none;padding:8px 10px 0;line-height:1.3;white-space:pre-wrap;word-break:break-all;
@@ -93,8 +107,7 @@ body.view .del,body.view .grip{display:none}
   <div class="row">
     <label>글자 <input id="tfs" type="range" min="14" max="80"></label>
     <label><input id="tb" type="checkbox"> 굵게</label>
-    <span class="sws" id="tsws"></span>
-    <input id="tc" type="color" title="직접 색 고르기">
+    <button id="tcb" class="cbtn" type="button" title="글자색"><i class="cdot" id="tcd"></i>글자색</button>
     <span class="seg" id="tal"></span>
   </div>
   <div class="row"><label>제목 폰트 <select id="tf" class="fsel"></select></label></div>
@@ -102,8 +115,7 @@ body.view .del,body.view .grip{display:none}
   <div class="row">
     <label>글자 <input id="mfs" type="range" min="14" max="72"></label>
     <label><input id="mb" type="checkbox"> 굵게</label>
-    <span class="sws" id="sws"></span>
-    <input id="mc" type="color" title="직접 색 고르기">
+    <button id="mcb" class="cbtn" type="button" title="글자색"><i class="cdot" id="mcd"></i>글자색</button>
     <span class="seg" id="mal"></span>
   </div>
   <div class="row"><label>메시지 폰트 <select id="mf" class="fsel"></select></label></div>
@@ -113,6 +125,7 @@ body.view .del,body.view .grip{display:none}
     <button id="add" class="main">추가</button>
     <button id="next" class="main">다음 / 완료</button>
     <button id="undo">되돌리기</button>
+    <button id="copy">셋리스트 복사</button>
   </div>
   <div class="row">
     <label>방송 글자 크기 <input id="fs" type="range" min="14" max="44" step="1"></label>
@@ -129,15 +142,26 @@ body.view .del,body.view .grip{display:none}
 </div>
 <div id="list"></div>
 
+<div id="pal">
+  <div class="pslots" id="pslots"></div>
+  <div class="prow">
+    <label title="직접 고르기">직접 <input id="pcol" type="color"></label>
+    <button id="pedit" type="button">칸 편집</button>
+    <button id="prst" type="button">기본색 복원</button>
+  </div>
+  <div class="phint" id="phint"></div>
+</div>
+
 <script>
 const K = 'setlist.v1', C = 'setlist.cfg';
+const DEF_SW = ['#ffffff', '#ffe14d', '#ff8fb8', '#7fd6ff', '#8cf29a', '#ffab5e'];
 const mode = new URLSearchParams(location.search).get('mode') === 'view' ? 'view' : 'control';
 document.body.className = mode;
 
 let S = { q: [], d: [], h: [] };   // q: 대기열(q[0]=Now Playing), d: 부른 곡, h: 되돌리기 기록
 let cfg = { fs: 22, hide: false, msg: '', mfs: 30, mb: true, mc: '#ffffff',
              tt: "Today's Setlist", tfs: 40, tb: true, tc: '#ffffff',
-             ta: 'left', ma: 'left', tf: '', mf: '', lf: '' };
+             ta: 'left', ma: 'left', tf: '', mf: '', lf: '', sw: DEF_SW.slice() };
 let drag = -1, drop = -1, lastRaw = '';
 
 function load() {
@@ -149,6 +173,10 @@ function load() {
     const craw = localStorage.getItem(C) || '';
     const c = JSON.parse(craw || 'null');
     if (c) cfg = { ...cfg, ...c };
+    cfg.sw = DEF_SW.map((d, i) => {
+      const v = (Array.isArray(cfg.sw) ? cfg.sw : [])[i];
+      return typeof v === 'string' && /^#[0-9a-f]{6}$/i.test(v) ? v.toLowerCase() : d;
+    });
     lastRaw = raw + '|' + craw;
   } catch (e) {}
 }
@@ -237,11 +265,15 @@ function render() {
 
   document.getElementById('next').disabled = !S.q.length;
   document.getElementById('undo').disabled = !S.h.length;
+  document.getElementById('copy').disabled = !(S.d.length || S.q.length);
+  document.getElementById('tcd').style.background = cfg.tc;
+  document.getElementById('mcd').style.background = cfg.mc;
+  renderPal();
   fitMarquee();
 }
 
 /* Now Playing 마퀴: 제목이 넘칠 때만 끊김 없이 흘러가게 함 */
-const MQ_SPEED = 70;   // 초당 이동 px
+const MQ_SPEED = 50;   // 초당 이동 px
 function fitMarquee() {
   document.querySelectorAll('.mq').forEach(m => {
     const tr = m.firstChild, txt = m.dataset.t;
@@ -290,23 +322,16 @@ fsEl.oninput = () => { cfg.fs = +fsEl.value; save(); render(); };
 hideEl.onchange = () => { cfg.hide = hideEl.checked; save(); render(); };
 
 const msgEl = document.getElementById('msg'), mfsEl = document.getElementById('mfs'),
-      mbEl = document.getElementById('mb'), mcEl = document.getElementById('mc');
+      mbEl = document.getElementById('mb');
 msgEl.oninput = () => { cfg.msg = msgEl.value; save(); render(); };
 mfsEl.oninput = () => { cfg.mfs = +mfsEl.value; save(); render(); };
 mbEl.onchange = () => { cfg.mb = mbEl.checked; save(); render(); };
-mcEl.oninput = () => { cfg.mc = mcEl.value; save(); render(); };
 
 const ttEl = document.getElementById('tt'), tfsEl = document.getElementById('tfs'),
-      tbEl = document.getElementById('tb'), tcEl = document.getElementById('tc');
+      tbEl = document.getElementById('tb');
 ttEl.oninput = () => { cfg.tt = ttEl.value; save(); render(); };
 tfsEl.oninput = () => { cfg.tfs = +tfsEl.value; save(); render(); };
 tbEl.onchange = () => { cfg.tb = tbEl.checked; save(); render(); };
-tcEl.oninput = () => { cfg.tc = tcEl.value; save(); render(); };
-['#ffffff', '#ffe14d', '#ff8fb8', '#7fd6ff', '#8cf29a', '#ffab5e'].forEach(c => {
-  const b = el('button', 'sw'); b.style.background = c; b.title = c;
-  b.onclick = () => { cfg.tc = c; tcEl.value = c; save(); render(); };
-  document.getElementById('tsws').appendChild(b);
-});
 
 [['tal', 'ta'], ['mal', 'ma']].forEach(([id, key]) => {
   [['left', '좌'], ['center', '중'], ['right', '우']].forEach(([v, label]) => {
@@ -384,11 +409,6 @@ function fillSelects() {
 FKEYS.forEach(key => {
   document.getElementById(key).onchange = e => { cfg[key] = e.target.value; save(); render(); };
 });
-['#ffffff', '#ffe14d', '#ff8fb8', '#7fd6ff', '#8cf29a', '#ffab5e'].forEach(c => {
-  const b = el('button', 'sw'); b.style.background = c; b.title = c;
-  b.onclick = () => { cfg.mc = c; mcEl.value = c; save(); render(); };
-  document.getElementById('sws').appendChild(b);
-});
 
 let armTimer = 0;
 const resetBtn = document.getElementById('reset');
@@ -464,11 +484,106 @@ setInterval(sync, 1000);
 function syncControls() {
   fsEl.value = cfg.fs; hideEl.checked = cfg.hide;
   if (document.activeElement !== msgEl) msgEl.value = cfg.msg;
-  mfsEl.value = cfg.mfs; mbEl.checked = cfg.mb; mcEl.value = cfg.mc;
+  mfsEl.value = cfg.mfs; mbEl.checked = cfg.mb;
   if (document.activeElement !== ttEl) ttEl.value = cfg.tt;
-  tfsEl.value = cfg.tfs; tbEl.checked = cfg.tb; tcEl.value = cfg.tc;
+  tfsEl.value = cfg.tfs; tbEl.checked = cfg.tb;
   fillSelects();
 }
+
+/* 셋리스트 복사: 부른 곡 → 지금 곡 → 대기 곡 순서, "1. 곡명" 형식 */
+function legacyCopy(t) {
+  const a = document.createElement('textarea');
+  a.value = t; a.setAttribute('readonly', '');
+  a.style.cssText = 'position:fixed;left:-9999px;top:0;opacity:0';
+  document.body.appendChild(a); a.select();
+  let ok = false;
+  try { ok = document.execCommand('copy'); } catch (e) {}
+  a.remove();
+  if (!ok) throw new Error('copy failed');
+}
+function copyText(t) {
+  if (navigator.clipboard && navigator.clipboard.writeText) {
+    return navigator.clipboard.writeText(t).catch(() => legacyCopy(t));
+  }
+  try { legacyCopy(t); return Promise.resolve(); } catch (e) { return Promise.reject(e); }
+}
+const copyBtn = document.getElementById('copy');
+let copyTimer = 0;
+function flashCopy(msg) {
+  clearTimeout(copyTimer);
+  copyBtn.textContent = msg;
+  copyTimer = setTimeout(() => { copyBtn.textContent = '셋리스트 복사'; }, 1500);
+}
+copyBtn.onclick = () => {
+  const all = [...S.d, ...S.q];
+  if (!all.length) return;
+  copyText(all.map((s, i) => (i + 1) + '. ' + s.t).join('\n'))
+    .then(() => flashCopy('복사됨!'), () => flashCopy('복사 실패'));
+};
+
+/* 글자색 팔레트: 6칸 공유, 적용은 제목/메시지 각각 */
+const pal = document.getElementById('pal'), pslots = document.getElementById('pslots'),
+      pcol = document.getElementById('pcol'), pedit = document.getElementById('pedit'),
+      prst = document.getElementById('prst'), phint = document.getElementById('phint');
+let palTarget = null, palEdit = false, prstTimer = 0;
+function renderPal() {
+  if (palTarget === null) return;
+  const cur = cfg[palTarget].toLowerCase();
+  pslots.textContent = '';
+  cfg.sw.forEach((c, i) => {
+    const b = el('button', 'pslot' + (c === cur ? ' on' : ''));
+    b.type = 'button'; b.style.background = c; b.title = c; b.dataset.i = i;
+    pslots.appendChild(b);
+  });
+  if (pcol.value !== cur) pcol.value = cur;
+  pal.classList.toggle('edit', palEdit);
+  pedit.classList.toggle('on', palEdit);
+  phint.textContent = palEdit ? '바꿀 칸을 누르면 지금 색으로 교체돼요' : '칸을 누르면 색이 적용돼요';
+}
+function openPal(t, btn) {
+  if (pal.classList.contains('open') && palTarget === t) { closePal(); return; }
+  palTarget = t; palEdit = false;
+  pal.classList.add('open'); renderPal();
+  const r = btn.getBoundingClientRect(), w = pal.offsetWidth, h = pal.offsetHeight;
+  const x = Math.min(Math.max(6, r.left), Math.max(6, innerWidth - w - 6));
+  let y = r.bottom + 6;
+  if (y + h > innerHeight - 6 && r.top - h - 6 >= 6) y = r.top - h - 6;
+  pal.style.left = x + 'px'; pal.style.top = y + 'px';
+}
+function closePal() {
+  pal.classList.remove('open'); palTarget = null; palEdit = false; disarmPrst();
+}
+function disarmPrst() {
+  clearTimeout(prstTimer); delete prst.dataset.arm; prst.textContent = '기본색 복원';
+}
+document.getElementById('tcb').onclick = e => openPal('tc', e.currentTarget);
+document.getElementById('mcb').onclick = e => openPal('mc', e.currentTarget);
+pslots.onclick = e => {
+  const b = e.target.closest('.pslot');
+  if (!b || palTarget === null) return;
+  const i = +b.dataset.i;
+  if (palEdit) { cfg.sw[i] = cfg[palTarget].toLowerCase(); palEdit = false; }
+  else cfg[palTarget] = cfg.sw[i];
+  save(); render();
+};
+pcol.oninput = () => {
+  if (palTarget === null) return;
+  cfg[palTarget] = pcol.value; save(); render();
+};
+pedit.onclick = () => { palEdit = !palEdit; renderPal(); };
+prst.onclick = () => {
+  if (!prst.dataset.arm) {
+    prst.dataset.arm = '1'; prst.textContent = '한 번 더 누르면 복원';
+    prstTimer = setTimeout(disarmPrst, 3000); return;
+  }
+  disarmPrst(); cfg.sw = DEF_SW.slice(); save(); render();
+};
+document.addEventListener('mousedown', e => {
+  if (pal.classList.contains('open') && !e.target.closest('#pal, .cbtn')) closePal();
+});
+document.addEventListener('keydown', e => { if (e.key === 'Escape') closePal(); });
+window.addEventListener('scroll', closePal, true);
+window.addEventListener('resize', closePal);
 
 load(); syncControls(); render();
 </script>
