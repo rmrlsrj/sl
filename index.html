@@ -50,10 +50,10 @@ label{display:flex;align-items:center;gap:6px;color:#c8cad4}
 #fold .st{font-weight:400;color:#8a8d9a;font-size:12px}
 #panel.fold #settings{display:none}
 #settings{margin-top:4px}
-#settings > .row:first-child{background:#272935}   /* 뷰 스타일 칸도 메인 타이틀과 같은 밝기로 구분 */
+#settings > .row:first-child{background:#303342}   /* 뷰 스타일 칸을 밝게 구분 */
 .sec{margin-top:8px;padding:10px 12px 12px;border:1px solid #2e303a;border-radius:10px}
 .sec:first-child{margin-top:6px}
-.sec:nth-of-type(2){background:#272935;border-color:#3a3c4a}   /* 가운데(메인 타이틀) 칸만 살짝 옅게 */
+.sec:nth-of-type(2){background:#303342;border-color:#3a3c4a}   /* 메인 타이틀 칸을 밝게 구분 */
 .sec h3{margin:0;font-size:13px;font-weight:700;color:#c8cad4}
 .sec h3 .sd{margin-right:8px;font-weight:400;font-size:12px;color:#8a8d9a}
 #title{display:none;padding:8px 10px 0;line-height:1.2;white-space:pre-wrap;word-break:break-all;
@@ -139,8 +139,11 @@ body.view .del,body.view .edt,body.view .skp,body.view .grip{display:none}
 .card.wait{opacity:var(--wo,1)}
 .card.wait.editing{opacity:1}
 .card.wait.dragging{opacity:.35}
-.wait.before{box-shadow:0 -4px 0 0 #4da3ff}
-.wait.after{box-shadow:0 4px 0 0 #4da3ff}
+/* 드래그 삽입 위치: 모든 뷰 스타일에서 동일하게 보이는 안내선 */
+#list .card.wait.before,#list .card.wait.after{outline:2px solid #7fd6ff;outline-offset:2px}
+#list .card.wait.before::before,#list .card.wait.after::after{content:"여기에 놓기";position:absolute;z-index:5;left:12px;padding:1px 6px;border-radius:5px;background:#4da3ff;color:#07111d;font-size:11px;font-weight:800;line-height:16px;box-shadow:0 0 0 2px #07111d}
+#list .card.wait.before::before{top:-11px}
+#list .card.wait.after::after{bottom:-11px}
 
 /* ===== 뷰 스타일: 글래스 ♥ (body.glass) =====
    OBS 브라우저 소스는 뒤 배경을 흐릴 수 없어서 blur 대신 진한 반투명 보라로 가독성 확보 */
