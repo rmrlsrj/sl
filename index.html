@@ -188,21 +188,24 @@ body.glassy .done{border-color:rgba(169,155,232,.15)}
 body.neon{--n-pink:#ff6fb5;--n-lav:#a99be8;--n-ink:#14101f}
 body.neon #stage{margin:8px;padding:12px;border-radius:26px;
   background:linear-gradient(145deg,#211735,#14101f 62%,#1b1230);
-  box-shadow:0 0 22px rgba(169,155,232,.30),0 0 46px rgba(169,155,232,.12),inset 0 0 36px rgba(255,111,181,.07)}
+  border:2px solid var(--n-lav);
+  box-shadow:0 0 8px rgba(169,155,232,.55),0 0 16px rgba(169,155,232,.22),inset 0 0 12px rgba(169,155,232,.14)}
 /* 뷰는 제어부보다 한 단계 넉넉하게: 카드와 네온 배경 테두리가 붙어 보이지 않도록 여백 확보 */
 body.view.neon #stage{margin:12px;padding:28px 26px}
 body.control.neon #stage{margin:0}
 body.neon #head,body.neon .card{
   background:linear-gradient(135deg,#2a1b47,#14101f 74%);
-  border:1px solid rgba(169,155,232,.72);border-radius:12px;
-  box-shadow:inset 0 0 14px rgba(169,155,232,.10),0 0 6px rgba(169,155,232,.16)}
+  border:1px solid rgba(169,155,232,.45);border-radius:12px;
+  box-shadow:inset 0 0 12px rgba(169,155,232,.08)}
+/* 타이틀 카드: 대기 곡보다 한 단계 또렷한 라벤더 (핑크는 Now Playing 전용) */
+body.neon #head{border-color:rgba(169,155,232,.80);box-shadow:inset 0 0 14px rgba(169,155,232,.12),0 0 6px rgba(169,155,232,.28)}
 body.neon #head{margin:0 0 10px}
 /* 뷰 전용: 타이틀 카드를 위로 올리고, 나우 플레잉 카드의 네온 글로우와 겹치지 않게 간격 확보 */
 body.view.neon #stage{padding:26px}   /* 배경카드 안쪽 여백: 상하좌우 동일 */
 body.view.neon #head{margin:0 0 26px;padding-top:18px;padding-bottom:18px}   /* 타이틀 카드 상하 여유 */
 body.neon.view #list{padding:0}
 body.neon .no{color:rgba(201,190,255,.88)}
-body.neon .card.wait{box-shadow:inset 3px 0 0 rgba(169,155,232,.72),inset 0 0 14px rgba(169,155,232,.10),0 0 6px rgba(169,155,232,.16)}
+body.neon .card.wait{box-shadow:inset 3px 0 0 rgba(169,155,232,.60),inset 0 0 10px rgba(169,155,232,.06)}
 body.neon .done{border-color:rgba(169,155,232,.24)}
 body.neon .now{border:2px solid var(--n-pink);background:linear-gradient(135deg,#4a1d5b,#1b1029 72%);
   box-shadow:0 0 0 2px var(--n-pink),0 0 10px 2px rgba(255,111,181,.92),0 0 24px 5px rgba(255,111,181,.43),inset 0 0 22px rgba(255,111,181,.18)}
