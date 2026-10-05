@@ -91,14 +91,24 @@ body.control .card{font-size:15px}
 @keyframes mq{0%,15%{transform:translateX(0)}100%{transform:translateX(-50%)}}
 .badge{font-size:.55em;font-weight:800;background:#14ed9f;color:#04251a;padding:.2em .7em;border-radius:6px}
 .empty{color:rgba(255,255,255,.55);font-weight:600}
-.done{opacity:.6}
+.done{opacity:.7}
 .done .t{text-decoration:line-through}
 .del{background:none;color:#ff9a9a;padding:2px 6px;font-size:.9em}
 .del:hover{background:rgba(255,255,255,.1)}
+.edt,.skp{background:none;color:#c8cad4;padding:2px 6px;font-size:.9em}
+.edt:hover,.skp:hover{background:rgba(255,255,255,.1)}
+.skp:disabled:hover{background:none}
+.edt svg,.skp svg{display:block;width:1.15em;height:1.15em}
+.edit{flex:1;min-width:0;font:inherit;font-weight:var(--w,700);line-height:1.3;color:#fff;background:#12131a;border:1px solid #4da3ff;border-radius:6px;padding:.1em .4em}
+.edit:focus{outline:none;border-color:#7fd6ff}
+.done .edit{text-decoration:none}
+.done.editing{opacity:1}
+.now.swap > *{animation:nowin .4s ease-out}
+@keyframes nowin{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
 .grip{width:18px;height:14px;flex:none;cursor:grab;opacity:.7;
   background:linear-gradient(#fff 0 0) 0 0/100% 2px no-repeat,linear-gradient(#fff 0 0) 0 50%/100% 2px no-repeat,linear-gradient(#fff 0 0) 0 100%/100% 2px no-repeat}
 .grip:hover{opacity:1}
-body.view .del,body.view .grip{display:none}
+body.view .del,body.view .edt,body.view .skp,body.view .grip{display:none}
 .dragging{opacity:.35}
 .wait.before{box-shadow:0 -4px 0 0 #4da3ff}
 .wait.after{box-shadow:0 4px 0 0 #4da3ff}
@@ -167,6 +177,7 @@ let cfg = { fs: 22, hide: false, msg: '', mfs: 30, mb: true, mc: '#ffffff',
              tt: "Today's Setlist", tfs: 40, tb: true, tc: '#ffffff',
              ta: 'left', ma: 'left', tf: '', mf: '', lf: '', sw: DEF_SW.slice(), fold: false };
 let drag = -1, drop = -1, lastRaw = '';
+let editId = null, editDraft = '', suppressBlur = false, lastNowId;
 
 function load() {
   try {
@@ -205,6 +216,41 @@ function el(tag, cls, text) {
   return e;
 }
 
+const SVGA = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">';
+const ICO = {
+  edit: SVGA + '<path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg>',
+  skip: SVGA + '<path d="M12 3v12"/><path d="m7 11 5 5 5-5"/><path d="M5 21h14"/></svg>'
+};
+function iconBtn(cls, title, id, svg) {
+  const b = el('button', cls); b.type = 'button'; b.title = title; b.dataset.id = id; b.innerHTML = svg;
+  return b;
+}
+function delBtn(id) {
+  const b = el('button', 'del', '✕'); b.title = '삭제'; b.dataset.id = id;
+  return b;
+}
+function findSong(id) { return S.q.find(x => x.id === id) || S.d.find(x => x.id === id); }
+
+/* 제목 인라인 수정: Enter 저장 · Esc 취소 · 다른 곳 클릭 시 저장 · 빈 제목이면 취소 */
+function titleCell(song) {
+  if (editId !== song.id) return el('span', 't', song.t);
+  const i = el('input', 't edit'); i.type = 'text'; i.value = editDraft;
+  i.oninput = () => { editDraft = i.value; };
+  i.onkeydown = e => {
+    if (e.key === 'Enter' && !e.isComposing) { e.preventDefault(); finishEdit(true); }
+    else if (e.key === 'Escape') { e.preventDefault(); finishEdit(false); }
+  };
+  i.onblur = () => { if (!suppressBlur) finishEdit(true); };
+  return i;
+}
+function finishEdit(saveIt) {
+  if (editId === null) return;
+  const id = editId, txt = editDraft.trim(), song = findSong(id);
+  editId = null; editDraft = '';
+  if (saveIt && song && txt && txt !== song.t) commit(() => { song.t = txt; });
+  else render();
+}
+
 function render() {
   document.documentElement.style.setProperty('--fs', cfg.fs + 'px');
   document.documentElement.style.setProperty('--mfs', cfg.mfs);
@@ -230,42 +276,54 @@ function render() {
   mbEl.disabled = WEB_NAMES.has(cfg.mf);
   document.querySelectorAll('#mal button').forEach(b => b.classList.toggle('on', b.dataset.a === cfg.ma));
   const L = document.getElementById('list');
-  L.textContent = '';
+  suppressBlur = true; L.textContent = ''; suppressBlur = false;
   applyFont(L, cfg.lf);
   const nd = S.d.length;
 
   // Now Playing
   const now = el('div', 'card now');
   if (S.q[0]) {
+    const s0 = S.q[0], editing0 = editId === s0.id;
+    if (editing0) now.classList.add('editing');
     now.appendChild(el('div', 'badge', 'NOW PLAYING'));
     const line = el('div', 'line');
-    const nt = el('span', 't mq'); nt.dataset.t = S.q[0].t;
-    nt.appendChild(el('span', 'mqt', S.q[0].t));
-    line.append(el('span', 'no', nd + 1), nt);
-    const del = el('button', 'del', '✕'); del.title = '삭제'; del.dataset.id = S.q[0].id;
-    line.appendChild(del);
+    let tc;
+    if (editing0) tc = titleCell(s0);
+    else {
+      tc = el('span', 't mq'); tc.dataset.t = s0.t;
+      tc.appendChild(el('span', 'mqt', s0.t));
+    }
+    const skp = iconBtn('skp', '맨 뒤로 보내기', s0.id, ICO.skip);
+    skp.disabled = S.q.length < 2;
+    line.append(el('span', 'no', nd + 1), tc, iconBtn('edt', '제목 수정', s0.id, ICO.edit), skp, delBtn(s0.id));
     now.appendChild(line);
+    if (lastNowId !== undefined && lastNowId !== s0.id) now.classList.add('swap');
+    lastNowId = s0.id;
   } else {
     now.appendChild(el('div', 'empty', S.d.length ? '모든 곡을 불렀어요' : '신청곡을 추가해 주세요'));
+    lastNowId = null;
   }
   L.appendChild(now);
 
   // 대기 곡
   for (let i = 1; i < S.q.length; i++) {
-    const c = el('div', 'card wait'); c.dataset.i = i;
-    const del = el('button', 'del', '✕'); del.title = '삭제'; del.dataset.id = S.q[i].id;
-    c.append(el('span', 'no', nd + i + 1), el('span', 't', S.q[i].t), del, el('span', 'grip'));
+    const w = S.q[i];
+    const c = el('div', 'card wait' + (editId === w.id ? ' editing' : '')); c.dataset.i = i;
+    c.append(el('span', 'no', nd + i + 1), titleCell(w), iconBtn('edt', '제목 수정', w.id, ICO.edit), delBtn(w.id), el('span', 'grip'));
     L.appendChild(c);
   }
 
   // 부른 곡 (맨 아래, 이동 불가)
   if (!(mode === 'view' && cfg.hide)) {
-    S.d.forEach((s, j) => {
-      const c = el('div', 'card done');
-      c.append(el('span', 'no', j + 1), el('span', 't', s.t));
+    S.d.forEach((sg, j) => {
+      const c = el('div', 'card done' + (editId === sg.id ? ' editing' : ''));
+      c.append(el('span', 'no', j + 1), titleCell(sg), iconBtn('edt', '제목 수정', sg.id, ICO.edit), delBtn(sg.id));
       L.appendChild(c);
     });
   }
+
+  const ei = L.querySelector('.edit');
+  if (ei) { ei.focus(); const n = ei.value.length; ei.setSelectionRange(n, n); }
 
   document.getElementById('next').disabled = !S.q.length;
   document.getElementById('undo').disabled = !S.h.length;
@@ -433,9 +491,19 @@ function disarm() {
 
 /* 삭제 */
 document.getElementById('list').addEventListener('click', e => {
-  const b = e.target.closest('.del');
-  if (!b) return;
-  commit(() => { S.q = S.q.filter(s => s.id !== b.dataset.id); });
+  const b = e.target.closest('.del, .edt, .skp');
+  if (!b || b.disabled) return;
+  const id = b.dataset.id;
+  if (b.classList.contains('del')) {
+    if (editId === id) { editId = null; editDraft = ''; }
+    commit(() => { S.q = S.q.filter(x => x.id !== id); S.d = S.d.filter(x => x.id !== id); });
+  } else if (b.classList.contains('edt')) {
+    const song = findSong(id);
+    if (!song) return;
+    editId = id; editDraft = song.t; render();
+  } else if (S.q.length > 1 && S.q[0].id === id) {
+    commit(() => { S.q.push(S.q.shift()); });
+  }
 });
 
 /* 드래그로 순서 변경 (대기 곡만) */
@@ -480,7 +548,7 @@ L.addEventListener('dragend', () => { drag = -1; drop = -1; render(); });
 
 /* 동기화: storage 이벤트 + 1초 폴링(안전장치) */
 function sync() {
-  if (drag >= 0) return;
+  if (drag >= 0 || editId !== null) return;
   const raw = (localStorage.getItem(K) || '') + '|' + (localStorage.getItem(C) || '');
   if (raw !== lastRaw) { load(); syncControls(); render(); }
 }
