@@ -145,7 +145,7 @@ body.view .del,body.view .edt,body.view .skp,body.view .grip{display:none}
    OBS 브라우저 소스는 뒤 배경을 흐릴 수 없어서 blur 대신 진한 반투명 보라로 가독성 확보 */
 body.glass{--g-pink:#ff6fb5;--g-lav:#a99be8}
 body.glass #head,body.glass .card{
-  background:linear-gradient(135deg,rgba(38,26,74,.90),rgba(20,14,40,.90));
+  background:rgba(26,26,28,.90);
   border:1px solid rgba(169,155,232,.30);border-radius:16px}
 body.glass .no{color:rgba(201,190,255,.78)}
 body.glass .now .t{text-shadow:0 0 12px rgba(255,111,181,.55)}
@@ -153,14 +153,6 @@ body.glass .now .no{color:var(--g-pink)}
 body.glass .badge{background:linear-gradient(90deg,var(--g-pink),var(--g-lav));color:#1a1030;letter-spacing:.02em}
 body.glass .badge::before{content:"\2665";margin-right:.4em}
 body.glass .done{border-color:rgba(169,155,232,.15)}
-/* 글래스1만 목록 전체를 감싸는 기본 검정 패널 유지 */
-body.glass #stage{margin:8px;padding:14px;border-radius:22px;
-  background:rgba(26,26,28,.90);
-  border:1px solid rgba(169,155,232,.35);
-  box-shadow:0 0 0 1px rgba(255,111,181,.18),0 6px 24px rgba(0,0,0,.45)}
-body.control.glass #stage{margin:0}
-body.glass #head{margin:0 0 10px}
-body.glass.view #list{padding:0}
 
 /* ===== 뷰 스타일: 보라글래스 (body.glassy) = 1.2.3 반투명 보라, 현재 곡 테두리·글로우 없음 ===== */
 body.glassy{--g-pink:#ff6fb5;--g-lav:#a99be8}
