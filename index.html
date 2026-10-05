@@ -163,13 +163,26 @@ body.glass .card.wait{border-left:3px solid rgba(169,155,232,.60)}
 body.glass .done{border-color:rgba(169,155,232,.15)}
 /* 전체를 덮는 불투명 배경 패널(#stage): 어떤 씬 위에서도 제어부처럼 어두운 바탕 → 네온 글로우가 살아남 */
 body.glass #stage{margin:8px;padding:14px;border-radius:22px;
-  background:linear-gradient(160deg,#1f1240,#0f0a20);
+  background:linear-gradient(160deg,rgba(31,18,64,.78),rgba(15,10,32,.74));
   border:1px solid rgba(169,155,232,.35);
   box-shadow:0 0 0 1px rgba(255,111,181,.18),0 6px 24px rgba(0,0,0,.45)}
 body.control.glass #stage{margin:0}
 body.glass #head{margin:0 0 10px}
 body.glass.view #list{padding:0}
 body.glass .now{box-shadow:0 0 0 2px #ff6fb5,0 0 12px 2px rgba(255,111,181,.60),inset 0 0 20px rgba(255,111,181,.16)}
+
+/* ===== 뷰 스타일: 글래시 (body.glassy) = 1.2.3 반투명 보라, 현재 곡 테두리·글로우 없음 ===== */
+body.glassy{--g-pink:#ff6fb5;--g-lav:#a99be8}
+body.glassy #head,body.glassy .card{
+  background:linear-gradient(135deg,rgba(38,26,74,.80),rgba(20,14,40,.74));
+  border:1px solid rgba(169,155,232,.30);border-radius:16px}
+body.glassy .no{color:rgba(201,190,255,.78)}
+body.glassy .now .t{text-shadow:0 0 12px rgba(255,111,181,.55)}
+body.glassy .now .no{color:var(--g-pink)}
+body.glassy .badge{background:linear-gradient(90deg,var(--g-pink),var(--g-lav));color:#1a1030;letter-spacing:.02em}
+body.glassy .badge::before{content:"\2665";margin-right:.4em}
+body.glassy .card.wait{border-left:3px solid rgba(169,155,232,.60)}
+body.glassy .done{border-color:rgba(169,155,232,.15)}
 </style>
 </head>
 <body>
@@ -182,6 +195,7 @@ body.glass .now{box-shadow:0 0 0 2px #ff6fb5,0 0 12px 2px rgba(255,111,181,.60),
       <span class="seg" id="thm">
         <button type="button" data-t="classic">기본</button>
         <button type="button" data-t="glass">글래스 ♥</button>
+        <button type="button" data-t="glassy">글래시</button>
       </span>
     </div>
     <section class="sec">
@@ -393,8 +407,10 @@ function renderList() {
 }
 
 function render() {
-  document.body.classList.toggle('glass', cfg.theme === 'glass');
-  document.querySelectorAll('#thm button').forEach(b => b.classList.toggle('on', b.dataset.t === (cfg.theme === 'glass' ? 'glass' : 'classic')));
+  const th = (cfg.theme === 'glass' || cfg.theme === 'glassy') ? cfg.theme : 'classic';
+  document.body.classList.toggle('glass', th === 'glass');
+  document.body.classList.toggle('glassy', th === 'glassy');
+  document.querySelectorAll('#thm button').forEach(b => b.classList.toggle('on', b.dataset.t === th));
   document.documentElement.style.setProperty('--fs', cfg.fs + 'px');
   document.documentElement.style.setProperty('--wo', (cfg.wo == null ? 100 : cfg.wo) / 100);
   document.documentElement.style.setProperty('--mfs', cfg.mfs);
