@@ -241,7 +241,7 @@ function render() {
 }
 
 /* Now Playing 마퀴: 제목이 넘칠 때만 끊김 없이 흘러가게 함 */
-const MQ_SPEED = 50;   // 초당 이동 px
+const MQ_SPEED = 60;   // 초당 이동 px
 function fitMarquee() {
   document.querySelectorAll('.mq').forEach(m => {
     const tr = m.firstChild, txt = m.dataset.t;
