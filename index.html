@@ -154,7 +154,7 @@ body.view .del,body.view .edt,body.view .skp,body.view .grip{display:none}
         <span class="seg" id="mal"></span>
       </div>
       <div class="row"><label>폰트 <select id="mf" class="fsel"></select></label></div>
-      <div class="row"><label>선명도 <input id="bo" type="range" min="20" max="100" step="5"> <span id="bov" style="min-width:3em;color:#8a8d9a">100%</span></label></div>
+      <div class="row"><label>서브 글자 선명도 <input id="bo" type="range" min="20" max="100" step="5"> <span id="bov" style="min-width:3em;color:#8a8d9a">100%</span></label></div>
     </section>
     <section class="sec">
       <h3><span class="sd">둘째 줄</span>메인 타이틀</h3>
@@ -166,7 +166,7 @@ body.view .del,body.view .edt,body.view .skp,body.view .grip{display:none}
         <span class="seg" id="tal"></span>
       </div>
       <div class="row"><label>폰트 <select id="tf" class="fsel"></select></label></div>
-      <div class="row"><label>선명도 <input id="to" type="range" min="20" max="100" step="5"> <span id="tov" style="min-width:3em;color:#8a8d9a">100%</span></label></div>
+      <div class="row"><label>타이틀 카드 선명도 <input id="to" type="range" min="20" max="100" step="5"> <span id="tov" style="min-width:3em;color:#8a8d9a">100%</span></label></div>
     </section>
     <section class="sec">
       <h3>곡 리스트</h3>
@@ -360,7 +360,6 @@ function render() {
   T.style.display = cfg.tt ? 'block' : 'none';
   T.style.fontWeight = cfg.tb ? '800' : '400';
   T.style.color = cfg.tc;
-  T.style.opacity = (cfg.to == null ? 100 : cfg.to) / 100;
   T.style.textAlign = cfg.ta;
   applyFont(T, cfg.tf);
   tbEl.disabled = WEB_NAMES.has(cfg.tf);
@@ -369,6 +368,7 @@ function render() {
   B.textContent = cfg.msg;
   B.style.display = cfg.msg ? 'block' : 'none';
   $('head').style.display = (cfg.tt || cfg.msg) ? 'block' : 'none';
+  $('head').style.opacity = (cfg.to == null ? 100 : cfg.to) / 100;
   B.classList.toggle('sp', !!(cfg.tt && cfg.msg));
   B.style.fontWeight = cfg.mb ? '800' : '400';
   B.style.color = cfg.mc;
