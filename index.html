@@ -140,6 +140,25 @@ body.view .del,body.view .edt,body.view .skp,body.view .grip{display:none}
 .card.wait.dragging{opacity:.35}
 .wait.before{box-shadow:0 -4px 0 0 #4da3ff}
 .wait.after{box-shadow:0 4px 0 0 #4da3ff}
+
+/* ===== 뷰 스타일: 글래스 ♥ (body.glass) =====
+   OBS 브라우저 소스는 뒤 배경을 흐릴 수 없어서 blur 대신 진한 반투명 보라로 가독성 확보 */
+body.glass{--g-pink:#ff6fb5;--g-lav:#a99be8}
+body.glass #head,body.glass .card{
+  background:linear-gradient(135deg,rgba(38,26,74,.80),rgba(20,14,40,.74));
+  border:1px solid rgba(169,155,232,.30);border-radius:16px}
+body.glass .no{color:rgba(201,190,255,.78)}
+/* 현재 곡: 핑크 네온 테두리 + 글로우 */
+body.glass .now{border-color:rgba(255,111,181,.75);
+  box-shadow:0 0 0 1px rgba(255,111,181,.25),0 0 18px rgba(255,111,181,.40),inset 0 0 22px rgba(255,111,181,.10)}
+body.glass .now .t{text-shadow:0 0 12px rgba(255,111,181,.55)}
+body.glass .now .no{color:var(--g-pink)}
+/* 하트 뱃지 (곡명 시작선 정렬은 기존 .now .badge 규칙 그대로) */
+body.glass .badge{background:linear-gradient(90deg,var(--g-pink),var(--g-lav));color:#1a1030;letter-spacing:.02em}
+body.glass .badge::before{content:"\2665";margin-right:.4em}
+/* 대기 곡: 왼쪽 라벤더 띠 (box-shadow는 드래그 표시선이 쓰므로 border로 처리) */
+body.glass .card.wait{border-left:3px solid rgba(169,155,232,.60)}
+body.glass .done{border-color:rgba(169,155,232,.15)}
 </style>
 </head>
 <body>
@@ -147,6 +166,13 @@ body.view .del,body.view .edt,body.view .skp,body.view .grip{display:none}
 <div id="panel">
   <button id="fold" type="button" title="서브 타이틀·메인 타이틀·곡 리스트 설정 접기/펼치기"><span>설정</span><span class="st" id="foldst">접기 ▴</span></button>
   <div id="settings">
+    <div class="row" style="margin-top:6px">
+      <span style="font-weight:700;font-size:13px;color:#c8cad4">뷰 스타일</span>
+      <span class="seg" id="thm">
+        <button type="button" data-t="classic">기본</button>
+        <button type="button" data-t="glass">글래스 ♥</button>
+      </span>
+    </div>
     <section class="sec">
       <h3><span class="sd">첫째 줄</span>서브 타이틀</h3>
       <div class="row"><input id="msg" type="text" placeholder="서브 타이틀 (예: 한식 노래방~)"></div>
@@ -223,7 +249,7 @@ document.body.className = mode;
 let S = { q: [], d: [], h: [] };   // q: 대기열(q[0]=Now Playing), d: 부른 곡, h: 되돌리기 기록
 let cfg = { fs: 22, wo: 100, bo: 100, to: 100, hide: false, msg: '', mfs: 20, mb: false, mc: '#aeb1bd',
              tt: "Today's Setlist", tfs: 40, tb: true, tc: '#ffffff',
-             ta: 'left', ma: 'left', tf: '', mf: '', lf: '', sw: DEF_SW.slice(), fold: false };
+             ta: 'left', ma: 'left', tf: '', mf: '', lf: '', sw: DEF_SW.slice(), fold: false, theme: 'classic' };
 let drag = -1, drop = -1, lastRaw = '';
 let editId = null, editDraft = '', suppressBlur = false, lastNowId;
 let listKey = '', lastFs;   // 목록 재생성 판단용
@@ -354,6 +380,8 @@ function renderList() {
 }
 
 function render() {
+  document.body.classList.toggle('glass', cfg.theme === 'glass');
+  document.querySelectorAll('#thm button').forEach(b => b.classList.toggle('on', b.dataset.t === (cfg.theme === 'glass' ? 'glass' : 'classic')));
   document.documentElement.style.setProperty('--fs', cfg.fs + 'px');
   document.documentElement.style.setProperty('--wo', (cfg.wo == null ? 100 : cfg.wo) / 100);
   document.documentElement.style.setProperty('--mfs', cfg.mfs);
@@ -728,6 +756,7 @@ document.addEventListener('keydown', e => { if (e.key === 'Escape') closePal(); 
 window.addEventListener('scroll', closePal, true);
 window.addEventListener('resize', closePal);
 
+document.querySelectorAll('#thm button').forEach(b => { b.onclick = () => { cfg.theme = b.dataset.t; saveRender(); }; });
 $('fold').onclick = () => { cfg.fold = !cfg.fold; closePal(); saveRender(); };
 
 load(); syncControls(); render();
