@@ -62,10 +62,15 @@ body.view #list{padding:8px}
   background:rgba(26,26,28,.90);border:1px solid rgba(255,255,255,.14);font-size:var(--fs)}
 body.control .card{font-size:15px}
 .no{min-width:1.8em;font-weight:var(--w,700);color:rgba(255,255,255,.62);font-variant-numeric:tabular-nums}
-.t{flex:1;font-weight:var(--w,700);line-height:1.3;word-break:break-all}
-.now{flex-direction:column;align-items:flex-start;gap:.4em;padding:.8em 1em}
+.t{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-weight:var(--w,700);line-height:1.3}
+.now{flex-direction:column;align-items:flex-start;gap:.4em;padding:.8em .9em}
 .now .line{display:flex;align-items:center;gap:12px;width:100%}
-.now .line{font-size:1.7em}
+.now .t{font-size:1.7em}
+/* Now Playing 마퀴: 넘칠 때만 .run 적용 */
+.mqt{display:inline-block;white-space:nowrap;vertical-align:top;will-change:transform}
+.mqs{display:inline-block;vertical-align:top;padding-right:3em}
+.mqt.run{animation:mq var(--mqd,10s) linear infinite}
+@keyframes mq{0%,15%{transform:translateX(0)}100%{transform:translateX(-50%)}}
 .badge{font-size:.55em;font-weight:800;background:#14ed9f;color:#04251a;padding:.2em .7em;border-radius:6px}
 .empty{color:rgba(255,255,255,.55);font-weight:600}
 .done{opacity:.4}
@@ -202,7 +207,9 @@ function render() {
   if (S.q[0]) {
     now.appendChild(el('div', 'badge', 'NOW PLAYING'));
     const line = el('div', 'line');
-    line.append(el('span', 'no', nd + 1), el('span', 't', S.q[0].t));
+    const nt = el('span', 't mq'); nt.dataset.t = S.q[0].t;
+    nt.appendChild(el('span', 'mqt', S.q[0].t));
+    line.append(el('span', 'no', nd + 1), nt);
     const del = el('button', 'del', '✕'); del.title = '삭제'; del.dataset.id = S.q[0].id;
     line.appendChild(del);
     now.appendChild(line);
@@ -230,6 +237,29 @@ function render() {
 
   document.getElementById('next').disabled = !S.q.length;
   document.getElementById('undo').disabled = !S.h.length;
+  fitMarquee();
+}
+
+/* Now Playing 마퀴: 제목이 넘칠 때만 끊김 없이 흘러가게 함 */
+const MQ_SPEED = 50;   // 초당 이동 px
+function fitMarquee() {
+  document.querySelectorAll('.mq').forEach(m => {
+    const tr = m.firstChild, txt = m.dataset.t;
+    tr.classList.remove('run');
+    tr.textContent = txt;
+    if (tr.offsetWidth > m.clientWidth + 1) {
+      tr.textContent = '';
+      tr.append(el('span', 'mqs', txt), el('span', 'mqs', txt));
+      const unit = tr.firstChild.offsetWidth;
+      tr.style.setProperty('--mqd', (unit / MQ_SPEED / 0.85).toFixed(2) + 's');
+      tr.classList.add('run');
+    }
+  });
+}
+window.addEventListener('resize', fitMarquee);
+if (document.fonts) {
+  document.fonts.ready.then(fitMarquee);
+  document.fonts.addEventListener('loadingdone', fitMarquee);
 }
 
 /* 조작부 이벤트 */
