@@ -105,6 +105,8 @@ body.control .now .t{font-size:1em}
 .mqt.run{animation:mq var(--mqd,10s) linear infinite}
 @keyframes mq{0%,15%{transform:translateX(0)}100%{transform:translateX(-50%)}}
 .badge{font-size:.55em;font-weight:800;background:#14ed9f;color:#04251a;padding:.2em .7em;border-radius:6px}
+/* NOW PLAYING 뱃지를 곡명 시작선에 맞춤: 번호 칸(.no min-width 1.8em, 카드 글자 기준) + 간격 12px. 뱃지는 .55em이라 나눠서 환산 */
+.now .badge{margin-left:calc(1.8em / .55 + 12px)}
 .empty{color:rgba(255,255,255,.55);font-weight:600}
 .done{opacity:.6}
 .done .t{text-decoration:line-through}
