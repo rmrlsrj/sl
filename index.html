@@ -122,7 +122,7 @@ body.control .now .t{font-size:1em}
    블랙레드·라벤더·모노하트는 body.tk 쪽에서 --k-dot 색으로 따로 지정 */
 .badge::before{content:"";display:inline-block;width:1em;height:.9em;margin-right:.55em;vertical-align:-.08em;
   background:linear-gradient(currentColor 0 0) 0 100%/22% 40% no-repeat,linear-gradient(currentColor 0 0) 50% 100%/22% 85% no-repeat,linear-gradient(currentColor 0 0) 100% 100%/22% 60% no-repeat;
-  animation:keq 1.15s ease-in-out infinite}
+  animation:keq 1.8s linear infinite}
 /* NOW PLAYING 뱃지를 곡명 시작선에 맞춤: 번호 칸(.no min-width 1.8em, 카드 글자 기준) + 간격 12px. 뱃지는 .55em이라 나눠서 환산 */
 .now .badge{margin-left:calc(1.8em / .55 + 12px)}
 .empty{color:rgba(255,255,255,.55);font-weight:600}
@@ -234,13 +234,46 @@ body.tk .now .no{color:var(--k-a);text-shadow:0 0 10px rgba(var(--k-a-rgb),.9)}
 body.tk .badge{background:var(--k-badge);color:var(--k-badge-fg);letter-spacing:.05em;box-shadow:0 0 8px rgba(var(--k-a-rgb),.6)}
 body.tk .badge::before{content:"";display:inline-block;width:1em;height:.9em;margin-right:.55em;vertical-align:-.08em;
   background:linear-gradient(var(--k-dot) 0 0) 0 100%/22% 40% no-repeat,linear-gradient(var(--k-dot) 0 0) 50% 100%/22% 85% no-repeat,linear-gradient(var(--k-dot) 0 0) 100% 100%/22% 60% no-repeat;
-  animation:keq 1.15s ease-in-out infinite}
+  animation:keq 1.8s linear infinite}
+/* 멈칫 없이 흐르도록: 구간마다 감속하지 않게 linear + 사인파로 촘촘히 샘플링한 키프레임 (3막대 박자 다름) */
 @keyframes keq{
-  0%,100%{background-size:22% 40%,22% 85%,22% 60%}
-  20%{background-size:22% 90%,22% 45%,22% 100%}
-  40%{background-size:22% 55%,22% 100%,22% 35%}
-  60%{background-size:22% 100%,22% 60%,22% 80%}
-  80%{background-size:22% 35%,22% 90%,22% 50%}}
+  0%{background-size:22% 62%,22% 97%,22% 34%}
+  2.78%{background-size:22% 75%,22% 84%,22% 30%}
+  5.56%{background-size:22% 87%,22% 66%,22% 27%}
+  8.33%{background-size:22% 95%,22% 47%,22% 26%}
+  11.11%{background-size:22% 99%,22% 32%,22% 25%}
+  13.89%{background-size:22% 99%,22% 25%,22% 25%}
+  16.67%{background-size:22% 95%,22% 28%,22% 27%}
+  19.44%{background-size:22% 87%,22% 41%,22% 30%}
+  22.22%{background-size:22% 75%,22% 59%,22% 33%}
+  25%{background-size:22% 63%,22% 78%,22% 38%}
+  27.78%{background-size:22% 50%,22% 93%,22% 43%}
+  30.56%{background-size:22% 38%,22% 100%,22% 49%}
+  33.33%{background-size:22% 30%,22% 97%,22% 55%}
+  36.11%{background-size:22% 26%,22% 84%,22% 62%}
+  38.89%{background-size:22% 26%,22% 66%,22% 68%}
+  41.67%{background-size:22% 30%,22% 47%,22% 75%}
+  44.44%{background-size:22% 38%,22% 32%,22% 81%}
+  47.22%{background-size:22% 50%,22% 25%,22% 86%}
+  50%{background-size:22% 62%,22% 28%,22% 91%}
+  52.78%{background-size:22% 75%,22% 41%,22% 95%}
+  55.56%{background-size:22% 87%,22% 59%,22% 98%}
+  58.33%{background-size:22% 95%,22% 78%,22% 99%}
+  61.11%{background-size:22% 99%,22% 93%,22% 100%}
+  63.89%{background-size:22% 99%,22% 100%,22% 100%}
+  66.67%{background-size:22% 95%,22% 97%,22% 98%}
+  69.44%{background-size:22% 87%,22% 84%,22% 95%}
+  72.22%{background-size:22% 75%,22% 66%,22% 92%}
+  75%{background-size:22% 63%,22% 47%,22% 87%}
+  77.78%{background-size:22% 50%,22% 32%,22% 82%}
+  80.56%{background-size:22% 38%,22% 25%,22% 76%}
+  83.33%{background-size:22% 30%,22% 28%,22% 70%}
+  86.11%{background-size:22% 26%,22% 41%,22% 63%}
+  88.89%{background-size:22% 26%,22% 59%,22% 57%}
+  91.67%{background-size:22% 30%,22% 78%,22% 50%}
+  94.44%{background-size:22% 38%,22% 93%,22% 44%}
+  97.22%{background-size:22% 50%,22% 100%,22% 39%}
+  100%{background-size:22% 62%,22% 97%,22% 34%}}
 
 /* --- 블랙레드: 검정 점퍼 + 레드 소매 라인 (화려) --- */
 body.bred{--k-a:#ff2d46;--k-a-rgb:255,45,70;--k-sw:255,255,255;
