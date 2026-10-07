@@ -193,10 +193,10 @@ body.clean .card.more::before,body.clean .card.more::after{content:"";flex:1;bor
 
 /* ===== 뷰 스타일: 화려 (body.fancy) =====
    핑크·라벤더·하늘 그라데이션 테두리 + 은은한 글로우 + 반짝이. OBS는 뒤 배경을 흐릴 수 없어서 blur 없이 불투명 면으로 구성
-   움직임은 지금 곡 테두리 흐름과 반짝이 두 가지뿐 */
+   움직임은 지금 곡 테두리 흐름과 NOW PLAYING 뱃지의 빛 스침 두 가지뿐 */
 body.fancy{--f-pink:#ff8fc5;--f-lav:#b9adf2;--f-blue:#8ec5ff}
 @keyframes fcbd{to{background-position:0 0,0 0,200% 0}}
-@keyframes ftwk{0%,100%{opacity:.25;transform:scale(.7)}50%{opacity:1;transform:scale(1.15)}}
+@keyframes fshn{0%{background-position:-10% 0,0 0}55%,100%{background-position:110% 0,0 0}}
 /* 타이틀 카드: 그라데이션 테두리(1px, 줄맞춤 유지) + 바깥 얇은 링 + 글로우 */
 body.fancy #head{position:relative;border:1px solid transparent;border-radius:16px;
   background:radial-gradient(90% 170% at 0 0,rgba(185,173,242,.30),transparent 62%) padding-box,
@@ -205,7 +205,7 @@ body.fancy #head{position:relative;border:1px solid transparent;border-radius:16
   box-shadow:0 0 0 1px rgba(185,173,242,.22),0 0 12px rgba(185,173,242,.30)}
 body.fancy #head #title{text-shadow:0 0 12px rgba(185,173,242,.65)}
 body.fancy #head::after{content:"\2726  \2665  \2726";position:absolute;top:8px;right:16px;font-size:12px;letter-spacing:.2em;line-height:1;
-  color:var(--f-pink);text-shadow:0 0 8px rgba(255,143,197,.9);pointer-events:none;animation:ftwk 2.6s ease-in-out infinite}
+  color:var(--f-pink);text-shadow:0 0 8px rgba(255,143,197,.9);pointer-events:none;opacity:.85}
 /* 카드: 왼쪽 짧은 그라데이션 바(홀짝 색 교차) + 라벤더 테두리 */
 body.fancy .card{border:1px solid rgba(185,173,242,.34);border-radius:14px;
   background:linear-gradient(180deg,#ffb0d6,#b9adf2) 9px 50%/3px 56% no-repeat,linear-gradient(135deg,#271d45,#171229)}
@@ -219,12 +219,12 @@ body.fancy .now{border:1px solid transparent;border-radius:16px;
   background-size:auto,auto,200% 100%;background-position:0 0,0 0,0 0;
   box-shadow:0 0 0 1px rgba(255,143,197,.28),0 0 9px 1px rgba(255,143,197,.42),0 0 18px 2px rgba(185,173,242,.28),inset 0 0 18px rgba(255,143,197,.10);
   animation:fcbd 7s linear infinite}
-body.fancy .now::before,body.fancy .now::after{position:absolute;pointer-events:none;color:var(--f-pink);text-shadow:0 0 8px rgba(255,143,197,.9);animation:ftwk 2.2s ease-in-out infinite}
+body.fancy .now::before,body.fancy .now::after{position:absolute;pointer-events:none;color:var(--f-pink);text-shadow:0 0 8px rgba(255,143,197,.9);opacity:.85}
 body.fancy .now::before{content:"\2726";right:2.3em;top:.5em;font-size:.7em}
-body.fancy .now::after{content:"\2665";right:.9em;top:.4em;font-size:.9em;animation-delay:.9s}
+body.fancy .now::after{content:"\2665";right:.9em;top:.4em;font-size:.9em}
 body.fancy .now .t{text-shadow:0 0 10px rgba(255,255,255,.35),0 0 18px rgba(255,143,197,.55)}
 body.fancy .now .no{color:var(--f-pink);text-shadow:0 0 10px rgba(255,143,197,.85)}
-body.fancy .badge{background:linear-gradient(90deg,var(--f-pink),var(--f-lav),var(--f-blue));color:#1b1530;letter-spacing:.05em;box-shadow:0 0 8px rgba(255,143,197,.55)}
+body.fancy .badge{background:linear-gradient(100deg,transparent 38%,rgba(255,255,255,.75) 50%,transparent 62%) -10% 0/250% 100% no-repeat,linear-gradient(90deg,var(--f-pink),var(--f-lav),var(--f-blue));animation:fshn 3.2s ease-in-out infinite;color:#1b1530;letter-spacing:.05em;box-shadow:0 0 8px rgba(255,143,197,.55)}
 body.fancy .badge::before{content:"\2665";margin-right:.4em}
 body.fancy .card.done{border-color:rgba(185,173,242,.16);background:linear-gradient(135deg,#221a3a,#161127)}
 /* "외 N곡 대기 중": 핑크↔라벤더로 번지는 양옆 선 */
