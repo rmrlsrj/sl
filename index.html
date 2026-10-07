@@ -202,72 +202,6 @@ body.neon .now .t{text-shadow:0 0 9px rgba(255,255,255,.5),0 0 16px rgba(255,111
 body.neon .now .no{color:#ff8fc5;text-shadow:0 0 10px rgba(255,111,181,.9)}
 body.neon .badge{background:linear-gradient(90deg,#ff6fb5,#a99be8);color:#14101f;letter-spacing:.04em;box-shadow:0 0 8px rgba(255,111,181,.65)}
 body.neon .badge::before{content:"✦";margin-right:.4em}
-
-/* ===== 뷰 스타일: 라벤더 프리즘 오로라 (body.prism) ===== */
-body.prism{--p-lav:#b8a5ff;--p-pink:#ff83d0;--p-blue:#8eeaff;--p-ink:#171328}
-body.prism #stage{position:relative;margin:8px;padding:14px;border-radius:28px;overflow:hidden;
-  background:linear-gradient(135deg,#271b4a 0%,#16152f 46%,#253d62 100%);
-  box-shadow:inset 0 0 0 1px rgba(214,193,255,.40),0 0 22px rgba(161,123,255,.50)}
-body.prism #stage::before{content:"";position:absolute;inset:0;pointer-events:none;opacity:.75;
-  background:linear-gradient(115deg,transparent 8%,rgba(255,131,208,.22) 26%,transparent 40%,rgba(142,234,255,.20) 55%,transparent 72%),
-  radial-gradient(circle at 84% 13%,rgba(225,182,255,.35),transparent 24%)}
-body.view.prism #stage{margin:12px;padding:26px}
-body.control.prism #stage{margin:0}
-body.prism #head,body.prism .card{position:relative;z-index:1;border:1px solid rgba(207,190,255,.42);border-radius:18px;
-  background:linear-gradient(120deg,rgba(91,61,148,.78),rgba(28,31,66,.88) 56%,rgba(44,94,133,.70));
-  box-shadow:inset 0 1px 0 rgba(255,255,255,.22),0 7px 18px rgba(7,5,25,.25)}
-body.prism #head{margin:0 0 10px;border-color:rgba(255,183,232,.66)}
-body.prism .no{color:var(--p-blue);text-shadow:0 0 8px rgba(142,234,255,.78)}
-body.prism .card.wait{box-shadow:inset 4px 0 0 rgba(184,165,255,.68),inset 0 1px 0 rgba(255,255,255,.18),0 7px 18px rgba(7,5,25,.25)}
-body.prism .now{border:2px solid var(--p-pink);background:linear-gradient(105deg,#8a3b91,#453781 52%,#2a6f96);
-  box-shadow:0 0 0 3px rgba(255,131,208,.25),0 0 24px rgba(255,131,208,.63),inset 0 0 24px rgba(181,220,255,.18)}
-body.prism .now .t{text-shadow:0 0 12px rgba(255,255,255,.70),0 0 21px rgba(255,131,208,.92)}
-body.prism .now .no{color:#ffd0ee;text-shadow:0 0 12px var(--p-pink)}
-body.prism .badge{background:linear-gradient(90deg,#ff8bd4,#b8a5ff,#8eeaff);color:#20133a;letter-spacing:.08em;box-shadow:0 0 12px rgba(255,176,227,.72)}
-body.prism .badge::before{content:"✦";margin-right:.4em}
-
-/* ===== 뷰 스타일: 핑크 레드 글램 아이돌 (body.glam) ===== */
-body.glam{--gl-pink:#ff5caa;--gl-red:#ef315c;--gl-gold:#ffd47f;--gl-ink:#211019}
-body.glam #stage{position:relative;margin:8px;padding:14px;border-radius:24px;overflow:hidden;
-  background:radial-gradient(circle at 82% 5%,rgba(255,97,172,.43),transparent 28%),linear-gradient(145deg,#401020,#170f19 52%,#4b1525);
-  box-shadow:inset 0 0 0 1px rgba(255,160,195,.34),0 0 25px rgba(239,49,92,.52)}
-body.glam #stage::before{content:"✦  ✦  ✦";position:absolute;inset:8px 16px auto auto;z-index:0;color:rgba(255,212,127,.78);font-size:16px;letter-spacing:11px;transform:rotate(-8deg)}
-body.view.glam #stage{margin:12px;padding:26px}
-body.control.glam #stage{margin:0}
-body.glam #head,body.glam .card{position:relative;z-index:1;border:1px solid rgba(255,135,183,.45);border-radius:12px;
-  background:linear-gradient(100deg,rgba(90,21,50,.94),rgba(39,16,30,.94) 62%,rgba(100,20,48,.88));
-  box-shadow:inset 0 1px 0 rgba(255,225,238,.18),0 6px 16px rgba(0,0,0,.32)}
-body.glam #head{margin:0 0 10px;border-color:rgba(255,212,127,.68);box-shadow:inset 0 0 18px rgba(255,212,127,.07),0 6px 16px rgba(0,0,0,.32)}
-body.glam .no{color:#ffb0d5;text-shadow:0 0 8px rgba(255,92,170,.90)}
-body.glam .card.wait{border-left:4px solid var(--gl-pink)}
-body.glam .now{border:2px solid var(--gl-gold);background:linear-gradient(105deg,#a61d57,#4b122c 58%,#711537);
-  box-shadow:0 0 0 2px rgba(255,212,127,.27),0 0 22px rgba(255,78,150,.72),inset 0 0 26px rgba(255,212,127,.12)}
-body.glam .now .t{text-shadow:0 2px 0 rgba(80,8,35,.7),0 0 17px rgba(255,92,170,.95)}
-body.glam .now .no{color:var(--gl-gold);text-shadow:0 0 12px rgba(255,212,127,.86)}
-body.glam .badge{background:linear-gradient(90deg,#ffd47f,#ff7ebc,#ef315c);color:#3a1024;letter-spacing:.08em;box-shadow:0 0 12px rgba(255,100,174,.80)}
-body.glam .badge::before{content:"★";margin-right:.35em}
-
-/* ===== 뷰 스타일: 아이스 블루 퍼플 크리스털 (body.crystal) ===== */
-body.crystal{--cr-ice:#91edff;--cr-violet:#9f8dff;--cr-deep:#111a35;--cr-white:#effcff}
-body.crystal #stage{position:relative;margin:8px;padding:14px;border-radius:24px;overflow:hidden;
-  background:linear-gradient(145deg,#172959,#111a35 48%,#31245e);
-  box-shadow:inset 0 0 0 1px rgba(145,237,255,.44),0 0 23px rgba(116,163,255,.48)}
-body.crystal #stage::before{content:"";position:absolute;inset:0;pointer-events:none;opacity:.54;
-  background:linear-gradient(128deg,transparent 0 42%,rgba(145,237,255,.20) 42.3% 43%,transparent 43.4% 67%,rgba(159,141,255,.22) 67.3% 68%,transparent 68.4%),radial-gradient(circle at 12% 8%,rgba(145,237,255,.35),transparent 23%)}
-body.view.crystal #stage{margin:12px;padding:26px}
-body.control.crystal #stage{margin:0}
-body.crystal #head,body.crystal .card{position:relative;z-index:1;border:1px solid rgba(145,237,255,.42);border-radius:10px;
-  background:linear-gradient(132deg,rgba(59,101,165,.69),rgba(19,32,69,.93) 57%,rgba(77,48,132,.76));
-  box-shadow:inset 0 1px 0 rgba(239,252,255,.30),inset 1px 0 0 rgba(145,237,255,.14),0 7px 17px rgba(3,10,32,.34)}
-body.crystal #head{margin:0 0 10px;border-color:rgba(239,252,255,.65)}
-body.crystal .no{color:var(--cr-ice);text-shadow:0 0 9px rgba(145,237,255,.84)}
-body.crystal .card.wait{border-left:4px solid rgba(145,237,255,.75)}
-body.crystal .now{border:2px solid var(--cr-ice);background:linear-gradient(115deg,#387eb2,#283b81 53%,#654ba7);
-  box-shadow:0 0 0 3px rgba(145,237,255,.20),0 0 22px rgba(145,237,255,.68),inset 0 0 26px rgba(239,252,255,.15)}
-body.crystal .now .t{text-shadow:0 0 12px rgba(239,252,255,.86),0 0 20px rgba(145,237,255,.84)}
-body.crystal .now .no{color:var(--cr-white);text-shadow:0 0 12px var(--cr-ice)}
-body.crystal .badge{background:linear-gradient(90deg,#91edff,#d8fbff,#9f8dff);color:#18234d;letter-spacing:.08em;box-shadow:0 0 12px rgba(145,237,255,.74)}
-body.crystal .badge::before{content:"◆";margin-right:.38em}
 </style>
 </head>
 <body>
@@ -281,9 +215,6 @@ body.crystal .badge::before{content:"◆";margin-right:.38em}
         <button type="button" data-t="classic">기본</button>
         <button type="button" data-t="glass">글래스1</button>
         <button type="button" data-t="neon">네온사인</button>
-        <button type="button" data-t="prism">프리즘</button>
-        <button type="button" data-t="glam">글램</button>
-        <button type="button" data-t="crystal">크리스털</button>
       </span>
     </div>
     <section class="sec">
@@ -500,12 +431,9 @@ function renderList() {
 }
 
 function render() {
-  const th = ['classic', 'glass', 'neon', 'prism', 'glam', 'crystal'].includes(cfg.theme) ? cfg.theme : 'classic';
+  const th = (cfg.theme === 'glass' || cfg.theme === 'neon') ? cfg.theme : 'classic';
   document.body.classList.toggle('glass', th === 'glass');
   document.body.classList.toggle('neon', th === 'neon');
-  document.body.classList.toggle('prism', th === 'prism');
-  document.body.classList.toggle('glam', th === 'glam');
-  document.body.classList.toggle('crystal', th === 'crystal');
   document.querySelectorAll('#thm button').forEach(b => b.classList.toggle('on', b.dataset.t === th));
   document.querySelectorAll('#nxs button').forEach(b => b.classList.toggle('on', +b.dataset.n === (cfg.nx || 0)));
   document.documentElement.style.setProperty('--fs', cfg.fs + 'px');
