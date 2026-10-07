@@ -204,7 +204,7 @@ body.neon .badge{background:linear-gradient(90deg,#ff6fb5,#a99be8);color:#14101f
 body.neon .badge::before{content:"✦";margin-right:.4em}
 
 /* ===== 뷰 스타일 3종 공통 (body.tk): 블랙레드 / 라벤더 / 모노하트 =====
-   색은 변수로만 바꾸고, 움직임(점멸·쓸고 지나가는 빛)은 NOW PLAYING 카드에서만 사용 */
+   색은 변수로만 바꾸고, 움직임(글로우 점멸·이퀄라이저)은 NOW PLAYING 카드에서만 사용 */
 body.tk #head,body.tk .card{
   background:linear-gradient(135deg,var(--k-bg1),var(--k-bg2) 74%);
   border:1px solid var(--k-line);border-radius:14px}
@@ -217,7 +217,7 @@ body.tk .card.wait{box-shadow:inset 3px 0 0 var(--k-bar)}
 body.tk .card.wait .t{color:rgba(255,255,255,.88)}
 body.tk .done{border-color:var(--k-line)}
 body.tk .card.more{color:var(--k-no)}
-/* NOW PLAYING: 가장 또렷하게 + 숨쉬듯 천천히 점멸하는 글로우 + 가끔 쓸고 지나가는 빛 */
+/* NOW PLAYING: 가장 또렷하게 + 숨쉬듯 천천히 점멸하는 글로우 */
 body.tk .now{position:relative;overflow:hidden;border:2px solid var(--k-a);
   background:var(--k-nbg);
   box-shadow:0 0 0 1px rgba(var(--k-a-rgb),.30),0 0 9px 1px rgba(var(--k-a-rgb),.55),0 0 18px 3px rgba(var(--k-a-rgb),.22),inset 0 0 18px rgba(var(--k-a-rgb),.12);
@@ -225,17 +225,19 @@ body.tk .now{position:relative;overflow:hidden;border:2px solid var(--k-a);
 @keyframes kglow{
   0%,100%{box-shadow:0 0 0 1px rgba(var(--k-a-rgb),.30),0 0 9px 1px rgba(var(--k-a-rgb),.50),0 0 18px 3px rgba(var(--k-a-rgb),.18),inset 0 0 18px rgba(var(--k-a-rgb),.10)}
   50%{box-shadow:0 0 0 1px rgba(var(--k-a-rgb),.45),0 0 12px 2px rgba(var(--k-a-rgb),.85),0 0 24px 5px rgba(var(--k-a-rgb),.38),inset 0 0 24px rgba(var(--k-a-rgb),.20)}}
-body.tk .now::after{content:"";position:absolute;top:0;bottom:0;left:0;width:42%;pointer-events:none;
-  background:linear-gradient(100deg,transparent,rgba(var(--k-sw),.16),transparent);
-  transform:translateX(-140%) skewX(-20deg);animation:ksweep 7s ease-in-out infinite}
-@keyframes ksweep{0%,55%{transform:translateX(-140%) skewX(-20deg)}100%{transform:translateX(360%) skewX(-20deg)}}
 body.tk .now .t{text-shadow:0 0 10px rgba(var(--k-a-rgb),.55),0 0 2px rgba(255,255,255,.35)}
 body.tk .now .no{color:var(--k-a);text-shadow:0 0 10px rgba(var(--k-a-rgb),.9)}
-/* NOW PLAYING 뱃지: 깜빡이는 점으로 "지금 재생 중" 표시 */
+/* NOW PLAYING 뱃지: 이퀄라이저 막대(스포티파이·애플뮤직·유튜브뮤직 등의 "재생 중" 표시)가 오르내림 */
 body.tk .badge{background:var(--k-badge);color:var(--k-badge-fg);letter-spacing:.05em;box-shadow:0 0 8px rgba(var(--k-a-rgb),.6)}
-body.tk .badge::before{content:"";display:inline-block;width:.55em;height:.55em;margin-right:.55em;border-radius:50%;
-  background:var(--k-dot);vertical-align:.04em;box-shadow:0 0 6px var(--k-dot);animation:kblink 1.8s ease-in-out infinite}
-@keyframes kblink{0%,100%{opacity:1}50%{opacity:.25}}
+body.tk .badge::before{content:"";display:inline-block;width:1em;height:.9em;margin-right:.55em;vertical-align:-.08em;
+  background:linear-gradient(var(--k-dot) 0 0) 0 100%/22% 40% no-repeat,linear-gradient(var(--k-dot) 0 0) 50% 100%/22% 85% no-repeat,linear-gradient(var(--k-dot) 0 0) 100% 100%/22% 60% no-repeat;
+  animation:keq 1.15s ease-in-out infinite}
+@keyframes keq{
+  0%,100%{background-size:22% 40%,22% 85%,22% 60%}
+  20%{background-size:22% 90%,22% 45%,22% 100%}
+  40%{background-size:22% 55%,22% 100%,22% 35%}
+  60%{background-size:22% 100%,22% 60%,22% 80%}
+  80%{background-size:22% 35%,22% 90%,22% 50%}}
 
 /* --- 블랙레드: 검정 점퍼 + 레드 소매 라인 (화려) --- */
 body.bred{--k-a:#ff2d46;--k-a-rgb:255,45,70;--k-sw:255,255,255;
