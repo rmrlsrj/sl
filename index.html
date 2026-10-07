@@ -202,6 +202,80 @@ body.neon .now .t{text-shadow:0 0 9px rgba(255,255,255,.5),0 0 16px rgba(255,111
 body.neon .now .no{color:#ff8fc5;text-shadow:0 0 10px rgba(255,111,181,.9)}
 body.neon .badge{background:linear-gradient(90deg,#ff6fb5,#a99be8);color:#14101f;letter-spacing:.04em;box-shadow:0 0 8px rgba(255,111,181,.65)}
 body.neon .badge::before{content:"✦";margin-right:.4em}
+
+/* ===== 뷰 스타일 3종 공통 (body.tk): 블랙레드 / 라벤더 / 모노하트 =====
+   색은 변수로만 바꾸고, 움직임(점멸·쓸고 지나가는 빛)은 NOW PLAYING 카드에서만 사용 */
+body.tk #head,body.tk .card{
+  background:linear-gradient(135deg,var(--k-bg1),var(--k-bg2) 74%);
+  border:1px solid var(--k-line);border-radius:14px}
+body.view.tk #head{margin:16px 16px 0}
+body.view.tk #list{padding:16px}   /* 글로우가 방송 화면 가장자리에서 잘리지 않도록 여백 확보 */
+body.tk #head{border-color:var(--k-line2)}
+body.tk .no{color:var(--k-no)}
+/* 대기 곡: 차분하게 (글로우·움직임 없음, 왼쪽 가는 막대만) */
+body.tk .card.wait{box-shadow:inset 3px 0 0 var(--k-bar)}
+body.tk .card.wait .t{color:rgba(255,255,255,.88)}
+body.tk .done{border-color:var(--k-line)}
+body.tk .card.more{color:var(--k-no)}
+/* NOW PLAYING: 가장 또렷하게 + 숨쉬듯 천천히 점멸하는 글로우 + 가끔 쓸고 지나가는 빛 */
+body.tk .now{position:relative;overflow:hidden;border:2px solid var(--k-a);
+  background:var(--k-nbg);
+  box-shadow:0 0 0 1px rgba(var(--k-a-rgb),.30),0 0 9px 1px rgba(var(--k-a-rgb),.55),0 0 18px 3px rgba(var(--k-a-rgb),.22),inset 0 0 18px rgba(var(--k-a-rgb),.12);
+  animation:kglow 3.8s ease-in-out infinite}
+@keyframes kglow{
+  0%,100%{box-shadow:0 0 0 1px rgba(var(--k-a-rgb),.30),0 0 9px 1px rgba(var(--k-a-rgb),.50),0 0 18px 3px rgba(var(--k-a-rgb),.18),inset 0 0 18px rgba(var(--k-a-rgb),.10)}
+  50%{box-shadow:0 0 0 1px rgba(var(--k-a-rgb),.45),0 0 12px 2px rgba(var(--k-a-rgb),.85),0 0 24px 5px rgba(var(--k-a-rgb),.38),inset 0 0 24px rgba(var(--k-a-rgb),.20)}}
+body.tk .now::after{content:"";position:absolute;top:0;bottom:0;left:0;width:42%;pointer-events:none;
+  background:linear-gradient(100deg,transparent,rgba(var(--k-sw),.16),transparent);
+  transform:translateX(-140%) skewX(-20deg);animation:ksweep 7s ease-in-out infinite}
+@keyframes ksweep{0%,55%{transform:translateX(-140%) skewX(-20deg)}100%{transform:translateX(360%) skewX(-20deg)}}
+body.tk .now .t{text-shadow:0 0 10px rgba(var(--k-a-rgb),.55),0 0 2px rgba(255,255,255,.35)}
+body.tk .now .no{color:var(--k-a);text-shadow:0 0 10px rgba(var(--k-a-rgb),.9)}
+/* NOW PLAYING 뱃지: 깜빡이는 점으로 "지금 재생 중" 표시 */
+body.tk .badge{background:var(--k-badge);color:var(--k-badge-fg);letter-spacing:.05em;box-shadow:0 0 8px rgba(var(--k-a-rgb),.6)}
+body.tk .badge::before{content:"";display:inline-block;width:.55em;height:.55em;margin-right:.55em;border-radius:50%;
+  background:var(--k-dot);vertical-align:.04em;box-shadow:0 0 6px var(--k-dot);animation:kblink 1.8s ease-in-out infinite}
+@keyframes kblink{0%,100%{opacity:1}50%{opacity:.25}}
+
+/* --- 블랙레드: 검정 점퍼 + 레드 소매 라인 (화려) --- */
+body.bred{--k-a:#ff2d46;--k-a-rgb:255,45,70;--k-sw:255,255,255;
+  --k-bg1:rgba(34,17,20,.95);--k-bg2:rgba(13,11,12,.95);
+  --k-line:rgba(255,45,70,.24);--k-line2:rgba(255,45,70,.60);--k-bar:rgba(225,29,52,.65);
+  --k-no:rgba(255,165,175,.78);
+  --k-nbg:radial-gradient(120% 150% at 100% 0,rgba(255,45,70,.30),transparent 58%),linear-gradient(135deg,#3d0d18,#120b0d 76%);
+  --k-badge:linear-gradient(90deg,#ff2d46,#b3122a);--k-badge-fg:#fff;--k-dot:#fff}
+body.bred #head{box-shadow:0 0 8px rgba(255,45,70,.28),inset 0 -2px 0 rgba(255,45,70,.60)}
+/* 점퍼 소매의 빨간 이중 라인 */
+body.bred .now::before{content:"";position:absolute;left:0;top:0;bottom:0;width:10px;pointer-events:none;
+  background:linear-gradient(90deg,#ff2d46 0 3px,transparent 3px 6px,rgba(255,45,70,.75) 6px 8px,transparent 8px)}
+
+/* --- 라벤더: 머리색 라벤더 + 아이스 블루 하이라이트 (은은하고 단정) --- */
+body.lav{--k-a:#a58bff;--k-a-rgb:165,139,255;--k-sw:225,232,255;
+  --k-bg1:rgba(33,27,62,.94);--k-bg2:rgba(16,13,32,.94);
+  --k-line:rgba(165,139,255,.26);--k-line2:rgba(190,175,255,.60);--k-bar:rgba(165,139,255,.60);
+  --k-no:rgba(207,216,255,.80);
+  --k-nbg:linear-gradient(135deg,#40308a,#15102e 74%);
+  --k-badge:linear-gradient(90deg,#8c78e0,#cfd8ff);--k-badge-fg:#130d2c;--k-dot:#2b1f66}
+body.lav #head{box-shadow:0 0 6px rgba(165,139,255,.22)}
+/* 윗변을 따라 흐르는 머리색 그라데이션 라인 */
+body.lav .now::before{content:"";position:absolute;left:0;right:0;top:0;height:3px;pointer-events:none;
+  background:linear-gradient(90deg,#8c78e0,#cfd8ff 55%,#8c78e0)}
+
+/* --- 모노하트: 검정·흰색 + 레드 포인트 (스켈레톤 하트 프린트 느낌) --- */
+body.mono{--k-a:#f4f4f6;--k-a-rgb:244,244,246;--k-sw:255,255,255;
+  --k-bg1:rgba(26,26,29,.95);--k-bg2:rgba(10,10,11,.95);
+  --k-line:rgba(255,255,255,.15);--k-line2:rgba(255,255,255,.42);--k-bar:rgba(255,255,255,.38);
+  --k-no:rgba(255,255,255,.58);
+  --k-nbg:linear-gradient(135deg,#2c2c31,#0e0e10 76%);
+  --k-badge:#f4f4f6;--k-badge-fg:#111;--k-dot:#ff2d46}
+body.mono #head{box-shadow:inset 0 -2px 0 rgba(255,45,70,.55)}
+body.mono .now{animation-name:kglowm}
+@keyframes kglowm{
+  0%,100%{box-shadow:0 0 0 1px rgba(244,244,246,.22),0 0 8px 1px rgba(244,244,246,.30),0 0 16px 3px rgba(244,244,246,.12),inset 0 0 16px rgba(244,244,246,.06)}
+  50%{box-shadow:0 0 0 1px rgba(244,244,246,.38),0 0 11px 2px rgba(244,244,246,.52),0 0 22px 4px rgba(244,244,246,.22),inset 0 0 22px rgba(244,244,246,.11)}}
+/* 아랫변의 레드 포인트 라인 */
+body.mono .now::before{content:"";position:absolute;left:12%;right:12%;bottom:0;height:3px;pointer-events:none;
+  background:linear-gradient(90deg,transparent,#ff2d46,transparent)}
 </style>
 </head>
 <body>
@@ -215,6 +289,9 @@ body.neon .badge::before{content:"✦";margin-right:.4em}
         <button type="button" data-t="classic">기본</button>
         <button type="button" data-t="glass">글래스1</button>
         <button type="button" data-t="neon">네온사인</button>
+        <button type="button" data-t="bred">블랙레드</button>
+        <button type="button" data-t="lav">라벤더</button>
+        <button type="button" data-t="mono">모노하트</button>
       </span>
     </div>
     <section class="sec">
@@ -431,9 +508,10 @@ function renderList() {
 }
 
 function render() {
-  const th = (cfg.theme === 'glass' || cfg.theme === 'neon') ? cfg.theme : 'classic';
-  document.body.classList.toggle('glass', th === 'glass');
-  document.body.classList.toggle('neon', th === 'neon');
+  const THEMES = ['glass', 'neon', 'bred', 'lav', 'mono'];
+  const th = THEMES.includes(cfg.theme) ? cfg.theme : 'classic';
+  THEMES.forEach(t => document.body.classList.toggle(t, th === t));
+  document.body.classList.toggle('tk', th === 'bred' || th === 'lav' || th === 'mono');
   document.querySelectorAll('#thm button').forEach(b => b.classList.toggle('on', b.dataset.t === th));
   document.querySelectorAll('#nxs button').forEach(b => b.classList.toggle('on', +b.dataset.n === (cfg.nx || 0)));
   document.documentElement.style.setProperty('--fs', cfg.fs + 'px');
