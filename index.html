@@ -172,67 +172,6 @@ body.glass .badge{background:linear-gradient(90deg,var(--g-pink),var(--g-lav));c
 body.glass .badge::before{content:"\2665";margin-right:.4em}
 body.glass .done{border-color:rgba(169,155,232,.15)}
 
-/* ===== 뷰 스타일: 클린 (body.clean) =====
-   불투명 차콜 면 + 가는 선 + 라벤더 한 가지 포인트. 글로우·그림자·움직임 없음 (빨강은 뱃지 하트 한 점만) */
-body.clean{--c-lav:#b9adf2;--c-red:#e5495f}
-body.clean #head,body.clean .card{background:rgba(24,23,30,.94);border:1px solid rgba(255,255,255,.09);border-radius:12px}
-/* 타이틀 카드 아래 가는 라벤더 선: 곡명 시작선에서 출발해 오른쪽으로 사라짐 */
-body.clean #head{position:relative}
-body.clean #head::after{content:"";position:absolute;left:var(--pl);right:var(--pr);bottom:0;height:2px;border-radius:2px;
-  background:linear-gradient(90deg,var(--c-lav),rgba(185,173,242,0))}
-body.clean .no{color:rgba(185,173,242,.78)}
-/* 지금 곡: 한 단계 밝은 면 + 왼쪽 라벤더 바 */
-body.clean .now{background:rgba(35,33,45,.96);border-color:rgba(185,173,242,.40);box-shadow:inset 3px 0 0 var(--c-lav)}
-body.clean .now .no{color:var(--c-lav)}
-body.clean .badge{background:transparent;color:var(--c-lav);border:1px solid rgba(185,173,242,.55);border-radius:999px;padding:.15em .75em;letter-spacing:.1em}
-body.clean .badge::before{content:"\2665";color:var(--c-red);margin-right:.45em}
-body.clean .done{border-color:rgba(255,255,255,.05)}
-/* "외 N곡 대기 중": 양옆 가는 선 */
-body.clean .card.more{background:transparent;border:0;border-radius:0;padding:.2em 0;gap:.7em;color:rgba(255,255,255,.62)}
-body.clean .card.more::before,body.clean .card.more::after{content:"";flex:1;border-top:1px solid rgba(185,173,242,.35)}
-
-/* ===== 뷰 스타일: 화려 (body.fancy) =====
-   핑크·라벤더·하늘 그라데이션 테두리 + 은은한 글로우 + 반짝이. OBS는 뒤 배경을 흐릴 수 없어서 blur 없이 불투명 면으로 구성
-   움직임은 지금 곡 테두리 흐름과 NOW PLAYING 뱃지의 빛 스침 두 가지뿐 */
-body.fancy{--f-pink:#ff8fc5;--f-lav:#b9adf2;--f-blue:#8ec5ff}
-@keyframes fcbd{to{background-position:0 0,0 0,200% 0}}
-@keyframes fshn{0%{background-position:-10% 0,0 0}55%,100%{background-position:110% 0,0 0}}
-/* 타이틀 카드: 그라데이션 테두리(1px, 줄맞춤 유지) + 바깥 얇은 링 + 글로우 */
-body.fancy #head{position:relative;border:1px solid transparent;border-radius:16px;
-  background:radial-gradient(90% 170% at 0 0,rgba(185,173,242,.30),transparent 62%) padding-box,
-    linear-gradient(135deg,#2e2056,#171229 78%) padding-box,
-    linear-gradient(100deg,var(--f-pink),var(--f-lav),var(--f-blue),var(--f-lav),var(--f-pink)) border-box;
-  box-shadow:0 0 0 1px rgba(185,173,242,.22),0 0 12px rgba(185,173,242,.30)}
-body.fancy #head #title{text-shadow:0 0 12px rgba(185,173,242,.65)}
-body.fancy #head::after{content:"\2726  \2665  \2726";position:absolute;top:8px;right:16px;font-size:12px;letter-spacing:.2em;line-height:1;
-  color:var(--f-pink);text-shadow:0 0 8px rgba(255,143,197,.9);pointer-events:none;opacity:.85}
-/* 카드: 왼쪽 짧은 그라데이션 바(홀짝 색 교차) + 라벤더 테두리 */
-body.fancy .card{border:1px solid rgba(185,173,242,.34);border-radius:14px;
-  background:linear-gradient(180deg,#ffb0d6,#b9adf2) 9px 50%/3px 56% no-repeat,linear-gradient(135deg,#271d45,#171229)}
-body.fancy .card.wait:nth-child(even){background:linear-gradient(180deg,#b9adf2,#8ec5ff) 9px 50%/3px 56% no-repeat,linear-gradient(135deg,#271d45,#171229)}
-body.fancy .no{color:rgba(210,201,255,.92)}
-/* 지금 곡: 흐르는 무지개 테두리 + 핑크 글로우 + 반짝이 */
-body.fancy .now{border:1px solid transparent;border-radius:16px;
-  background:radial-gradient(120% 150% at 100% 0,rgba(255,143,197,.30),transparent 60%) padding-box,
-    linear-gradient(135deg,#3b2470,#1b1530 72%) padding-box,
-    linear-gradient(100deg,var(--f-pink),var(--f-lav),var(--f-blue),var(--f-lav),var(--f-pink)) border-box;
-  background-size:auto,auto,200% 100%;background-position:0 0,0 0,0 0;
-  box-shadow:0 0 0 1px rgba(255,143,197,.28),0 0 9px 1px rgba(255,143,197,.42),0 0 18px 2px rgba(185,173,242,.28),inset 0 0 18px rgba(255,143,197,.10);
-  animation:fcbd 7s linear infinite}
-body.fancy .now::before,body.fancy .now::after{position:absolute;pointer-events:none;color:var(--f-pink);text-shadow:0 0 8px rgba(255,143,197,.9);opacity:.85}
-body.fancy .now::before{content:"\2726";right:2.3em;top:.5em;font-size:.7em}
-body.fancy .now::after{content:"\2665";right:.9em;top:.4em;font-size:.9em}
-body.fancy .now .t{text-shadow:0 0 10px rgba(255,255,255,.35),0 0 18px rgba(255,143,197,.55)}
-body.fancy .now .no{color:var(--f-pink);text-shadow:0 0 10px rgba(255,143,197,.85)}
-body.fancy .badge{background:linear-gradient(100deg,transparent 38%,rgba(255,255,255,.75) 50%,transparent 62%) -10% 0/250% 100% no-repeat,linear-gradient(90deg,var(--f-pink),var(--f-lav),var(--f-blue));animation:fshn 3.2s ease-in-out infinite;color:#1b1530;letter-spacing:.05em;box-shadow:0 0 8px rgba(255,143,197,.55)}
-body.fancy .badge::before{content:"\2665";margin-right:.4em}
-body.fancy .card.done{border-color:rgba(185,173,242,.16);background:linear-gradient(135deg,#221a3a,#161127)}
-/* "외 N곡 대기 중": 핑크↔라벤더로 번지는 양옆 선 */
-body.fancy .card.more{background:transparent;border:0;border-radius:0;padding:.2em 0;gap:.7em;color:rgba(255,255,255,.88)}
-body.fancy .card.more::before,body.fancy .card.more::after{content:"";flex:1;height:1px;border:0}
-body.fancy .card.more::before{background:linear-gradient(90deg,rgba(255,143,197,0),var(--f-pink))}
-body.fancy .card.more::after{background:linear-gradient(90deg,var(--f-lav),rgba(185,173,242,0))}
-
 /* ===== 뷰 스타일: 네온사인 (body.neon) ===== */
 body.neon{--n-pink:#ff6fb5;--n-lav:#a99be8;--n-ink:#14101f}
 body.neon #stage{margin:8px;padding:12px;border-radius:26px;
@@ -275,8 +214,6 @@ body.neon .badge::before{content:"✦";margin-right:.4em}
       <span class="seg" id="thm">
         <button type="button" data-t="classic">기본</button>
         <button type="button" data-t="glass">글래스1</button>
-        <button type="button" data-t="clean">클린</button>
-        <button type="button" data-t="fancy">화려</button>
         <button type="button" data-t="neon">네온사인</button>
       </span>
     </div>
@@ -494,10 +431,8 @@ function renderList() {
 }
 
 function render() {
-  const th = (cfg.theme === 'glass' || cfg.theme === 'clean' || cfg.theme === 'fancy' || cfg.theme === 'neon') ? cfg.theme : 'classic';
+  const th = (cfg.theme === 'glass' || cfg.theme === 'neon') ? cfg.theme : 'classic';
   document.body.classList.toggle('glass', th === 'glass');
-  document.body.classList.toggle('clean', th === 'clean');
-  document.body.classList.toggle('fancy', th === 'fancy');
   document.body.classList.toggle('neon', th === 'neon');
   document.querySelectorAll('#thm button').forEach(b => b.classList.toggle('on', b.dataset.t === th));
   document.querySelectorAll('#nxs button').forEach(b => b.classList.toggle('on', +b.dataset.n === (cfg.nx || 0)));
