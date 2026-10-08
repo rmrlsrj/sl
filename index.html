@@ -642,11 +642,8 @@ function fitView() {
   if (k < 1) st.style.zoom = k.toFixed(3);
   if (k !== lastZoom) { lastZoom = k; fitMarquee(); }
 }
-window.addEventListener('resize', () => { fitView(); fitMarquee(); });
-if (document.fonts) {
-  document.fonts.ready.then(() => { fitView(); fitMarquee(); });
-  document.fonts.addEventListener('loadingdone', () => { fitView(); fitMarquee(); });
-}
+window.addEventListener('resize', () => { fitView(); fitMarquee(); closePal(); });   // 창 크기가 바뀌면 뷰 맞춤 + 열린 팔레트 닫기
+if (document.fonts) document.fonts.addEventListener('loadingdone', () => { fitView(); fitMarquee(); });
 
 /* 조작부 이벤트 */
 function addSongs() {
@@ -671,25 +668,23 @@ $('undo').onclick = () => {
   const p = JSON.parse(S.h.pop());
   S.q = p.q; S.d = p.d; saveRender();
 };
-const fsEl = $('fs'), hideEl = $('hide'), woEl = $('wo'), wovEl = $('wov');
-const boEl = $('bo'), bovEl = $('bov'), toEl = $('to'), tovEl = $('tov');
-fsEl.oninput = () => { cfg.fs = +fsEl.value; saveRender(); };
-woEl.oninput = () => { cfg.wo = +woEl.value; wovEl.textContent = cfg.wo + '%'; saveRender(); };
-boEl.oninput = () => { cfg.bo = +boEl.value; bovEl.textContent = cfg.bo + '%'; saveRender(); };
-toEl.oninput = () => { cfg.to = +toEl.value; tovEl.textContent = cfg.to + '%'; saveRender(); };
-hideEl.onchange = () => { cfg.hide = hideEl.checked; saveRender(); };
-
-const msgEl = $('msg'), mfsEl = $('mfs'),
-      mbEl = $('mb');
-msgEl.oninput = () => { cfg.msg = msgEl.value; saveRender(); };
-mfsEl.oninput = () => { cfg.mfs = +mfsEl.value; saveRender(); };
-mbEl.onchange = () => { cfg.mb = mbEl.checked; saveRender(); };
-
-const ttEl = $('tt'), tfsEl = $('tfs'),
-      tbEl = $('tb');
-ttEl.oninput = () => { cfg.tt = ttEl.value; saveRender(); };
-tfsEl.oninput = () => { cfg.tfs = +tfsEl.value; saveRender(); };
-tbEl.onchange = () => { cfg.tb = tbEl.checked; saveRender(); };
+/* 슬라이더·체크박스·글상자 ↔ cfg 연결 표: [요소 id, cfg 키, 종류]
+   n: 숫자 슬라이더 · p: 퍼센트 슬라이더(값 표시칸 id = 요소 id + 'v') · c: 체크박스 · t: 글상자 */
+const BIND = [
+  ['fs', 'fs', 'n'], ['wo', 'wo', 'p'], ['bo', 'bo', 'p'], ['to', 'to', 'p'], ['hide', 'hide', 'c'],
+  ['msg', 'msg', 't'], ['mfs', 'mfs', 'n'], ['mb', 'mb', 'c'],
+  ['tt', 'tt', 't'], ['tfs', 'tfs', 'n'], ['tb', 'tb', 'c']
+];
+const mbEl = $('mb'), tbEl = $('tb');   // render() 가 폰트에 따라 굵게 칸을 잠글 때 사용
+BIND.forEach(([id, key, kind]) => {
+  const e = $(id);
+  if (kind === 'c') e.onchange = () => { cfg[key] = e.checked; saveRender(); };
+  else e.oninput = () => {
+    cfg[key] = kind === 't' ? e.value : +e.value;
+    if (kind === 'p') $(id + 'v').textContent = cfg[key] + '%';
+    saveRender();
+  };
+});
 
 [['tal', 'ta'], ['mal', 'ma']].forEach(([id, key]) => {
   [['left', '좌'], ['center', '중'], ['right', '우']].forEach(([v, label]) => {
@@ -857,14 +852,13 @@ window.addEventListener('storage', sync);
 setInterval(sync, 1000);
 
 function syncControls() {
-  fsEl.value = cfg.fs; hideEl.checked = cfg.hide;
-  woEl.value = cfg.wo == null ? 100 : cfg.wo; wovEl.textContent = woEl.value + '%';
-  boEl.value = cfg.bo == null ? 100 : cfg.bo; bovEl.textContent = boEl.value + '%';
-  toEl.value = cfg.to == null ? 100 : cfg.to; tovEl.textContent = toEl.value + '%';
-  if (document.activeElement !== msgEl) msgEl.value = cfg.msg;
-  mfsEl.value = cfg.mfs; mbEl.checked = cfg.mb;
-  if (document.activeElement !== ttEl) ttEl.value = cfg.tt;
-  tfsEl.value = cfg.tfs; tbEl.checked = cfg.tb;
+  BIND.forEach(([id, key, kind]) => {
+    const e = $(id);
+    if (kind === 'c') e.checked = cfg[key];
+    else if (kind === 't') { if (document.activeElement !== e) e.value = cfg[key]; }   // 입력 중인 칸은 건드리지 않음
+    else if (kind === 'p') { e.value = cfg[key] == null ? 100 : cfg[key]; $(id + 'v').textContent = e.value + '%'; }
+    else e.value = cfg[key];
+  });
   fillSelects();
 }
 
@@ -961,7 +955,6 @@ document.addEventListener('mousedown', e => {
 });
 document.addEventListener('keydown', e => { if (e.key === 'Escape') closePal(); });
 window.addEventListener('scroll', closePal, true);
-window.addEventListener('resize', closePal);
 
 document.querySelectorAll('#thm button').forEach(b => { b.onclick = () => { cfg.theme = b.dataset.t; saveRender(); }; });
 $('fold').onclick = () => { cfg.fold = !cfg.fold; closePal(); saveRender(); };
