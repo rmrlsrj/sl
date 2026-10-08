@@ -404,7 +404,7 @@ let cfg = { fs: 22, wo: 100, bo: 100, to: 100, hide: true, nx: 4, msg: '', mfs: 
              ta: 'left', ma: 'left', tf: '', mf: '', lf: '', sw: DEF_SW.slice(), fold: false, theme: 'classic' };
 let drag = -1, drop = -1, lastRaw = '';
 let editId = null, editDraft = '', suppressBlur = false, lastNowId;
-let listKey = '', lastFs;   // 목록 재생성 판단용
+let listKey = '', lastFs, lastTheme;   // 목록 재생성 판단용
 
 let lastK = '', lastC = '', lastH = '';   // 저장소에 마지막으로 쓴(읽은) 문자열: 바뀐 것만 다시 씀
 function load() {
@@ -497,16 +497,15 @@ function finishEdit(saveIt) {
 }
 
 function renderList() {
-  const L = $('list');
-  suppressBlur = true; L.textContent = ''; suppressBlur = false;
-  applyFont(L, cfg.lf);
+  const listEl = $('list');
+  suppressBlur = true; listEl.textContent = ''; suppressBlur = false;
+  applyFont(listEl, cfg.lf);
   const nd = S.d.length;
 
   // Now Playing
   const now = el('div', 'card now');
   if (S.q[0]) {
     const s0 = S.q[0], editing0 = editId === s0.id;
-    if (editing0) now.classList.add('editing');
     now.appendChild(el('div', 'badge', 'NOW PLAYING'));
     const line = el('div', 'line');
     let tc;
@@ -515,9 +514,12 @@ function renderList() {
       tc = el('span', 't mq'); tc.dataset.t = s0.t;
       tc.appendChild(el('span', 'mqt', s0.t));
     }
-    const skp = iconBtn('skp', '맨 뒤로 보내기', s0.id, ICO.skip);
-    skp.disabled = S.q.length < 2;
-    line.append(el('span', 'no', nd + 1), tc, iconBtn('edt', '제목 수정', s0.id, ICO.edit), skp, delBtn(s0.id));
+    line.append(el('span', 'no', nd + 1), tc);
+    if (mode !== 'view') {   // 뷰에서는 버튼을 만들지 않음
+      const skp = iconBtn('skp', '맨 뒤로 보내기', s0.id, ICO.skip);
+      skp.disabled = S.q.length < 2;
+      line.append(iconBtn('edt', '제목 수정', s0.id, ICO.edit), skp, delBtn(s0.id));
+    }
     now.appendChild(line);
     if (lastNowId !== undefined && lastNowId !== s0.id) now.classList.add('swap');
     lastNowId = s0.id;
@@ -525,7 +527,7 @@ function renderList() {
     now.appendChild(el('div', 'empty', S.d.length ? '모든 곡을 불렀어요' : '신청곡을 추가해 주세요'));
     lastNowId = null;
   }
-  L.appendChild(now);
+  listEl.appendChild(now);
 
   // 대기 곡
   const lim = (mode === 'view' && cfg.nx > 0) ? cfg.nx : Infinity;   // 뷰에서만 표시 개수 제한
@@ -533,21 +535,23 @@ function renderList() {
   for (let i = 1; i <= shown; i++) {
     const w = S.q[i];
     const c = el('div', 'card wait' + (editId === w.id ? ' editing' : '')); c.dataset.i = i;
-    c.append(el('span', 'no', nd + i + 1), titleCell(w), iconBtn('edt', '제목 수정', w.id, ICO.edit), delBtn(w.id), Object.assign(el('span', 'grip'), { title: '끌어서 순서 변경' }));
-    L.appendChild(c);
+    c.append(el('span', 'no', nd + i + 1), titleCell(w));
+    if (mode !== 'view') c.append(iconBtn('edt', '제목 수정', w.id, ICO.edit), delBtn(w.id), Object.assign(el('span', 'grip'), { title: '끌어서 순서 변경' }));
+    listEl.appendChild(c);
   }
-  if (S.q.length - 1 > shown) L.appendChild(el('div', 'card more', '외 ' + (S.q.length - 1 - shown) + '곡 대기 중'));
+  if (S.q.length - 1 > shown) listEl.appendChild(el('div', 'card more', '외 ' + (S.q.length - 1 - shown) + '곡 대기 중'));
 
   // 부른 곡 (맨 아래, 이동 불가)
   if (!(mode === 'view' && cfg.hide)) {
     S.d.forEach((sg, j) => {
       const c = el('div', 'card done' + (editId === sg.id ? ' editing' : ''));
-      c.append(el('span', 'no', j + 1), titleCell(sg), iconBtn('edt', '제목 수정', sg.id, ICO.edit), delBtn(sg.id));
-      L.appendChild(c);
+      c.append(el('span', 'no', j + 1), titleCell(sg));
+      if (mode !== 'view') c.append(iconBtn('edt', '제목 수정', sg.id, ICO.edit), delBtn(sg.id));
+      listEl.appendChild(c);
     });
   }
 
-  const ei = L.querySelector('.edit');
+  const ei = listEl.querySelector('.edit');
   if (ei) { ei.focus(); const n = ei.value.length; ei.setSelectionRange(n, n); }
 }
 
@@ -599,7 +603,7 @@ function render() {
   $('tcd').style.background = cfg.tc;
   $('mcd').style.background = cfg.mc;
   renderPal();
-  if (rebuilt || cfg.fs !== lastFs) { lastFs = cfg.fs; fitMarquee(); }
+  if (rebuilt || cfg.fs !== lastFs || th !== lastTheme) { lastFs = cfg.fs; lastTheme = th; fitMarquee(); }
   fitView();
 }
 
