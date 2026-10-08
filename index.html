@@ -392,7 +392,7 @@ body.mono .now::before{content:"";position:absolute;left:12%;right:12%;bottom:0;
 </div>
 
 <script>
-const K = 'setlist.v1', C = 'setlist.cfg';
+const K = 'setlist.v1', C = 'setlist.cfg', KH = 'setlist.h';   // KH: 되돌리기 기록 (곡 목록·설정과 따로 저장, 뷰는 읽지 않음)
 const DEF_SW = ['#ffffff', '#ffe14d', '#ff8fb8', '#7fd6ff', '#8cf29a', '#ffab5e'];
 const $ = id => document.getElementById(id);
 const mode = new URLSearchParams(location.search).get('mode') === 'view' ? 'view' : 'control';
@@ -406,27 +406,44 @@ let drag = -1, drop = -1, lastRaw = '';
 let editId = null, editDraft = '', suppressBlur = false, lastNowId;
 let listKey = '', lastFs;   // 목록 재생성 판단용
 
+let lastK = '', lastC = '', lastH = '';   // 저장소에 마지막으로 쓴(읽은) 문자열: 바뀐 것만 다시 씀
 function load() {
+  let raw = '', craw = '';
   try {
-    const raw = localStorage.getItem(K) || '';
+    raw = localStorage.getItem(K) || '';
+    craw = localStorage.getItem(C) || '';
     const s = JSON.parse(raw || 'null');
-    if (s && Array.isArray(s.q) && Array.isArray(s.d)) S = { q: s.q, d: s.d, h: s.h || [] };
+    const oldH = s && Array.isArray(s.h) ? s.h : [];   // 예전 형식(곡 목록 안에 기록 포함) 이어받기
+    if (s && Array.isArray(s.q) && Array.isArray(s.d)) S = { q: s.q, d: s.d, h: mode === 'control' ? oldH : [] };
     else S = { q: [], d: [], h: [] };
-    const craw = localStorage.getItem(C) || '';
     const c = JSON.parse(craw || 'null');
     if (c) cfg = { ...cfg, ...c };
     cfg.sw = DEF_SW.map((d, i) => {
       const v = (Array.isArray(cfg.sw) ? cfg.sw : [])[i];
       return typeof v === 'string' && /^#[0-9a-f]{6}$/i.test(v) ? v.toLowerCase() : d;
     });
-    lastRaw = raw + '|' + craw;
-  } catch (e) {}
+    if (mode === 'control') {   // 되돌리기 기록은 컨트롤부만 읽음
+      const hraw = localStorage.getItem(KH);
+      if (hraw !== null) {
+        const h = JSON.parse(hraw);
+        if (Array.isArray(h)) { S.h = h; lastH = hraw; }
+      }
+    }
+  } catch (e) {
+  } finally {
+    lastK = raw; lastC = craw;
+    lastRaw = raw + '|' + craw;   // 파싱에 실패해도 갱신: sync()가 매초 다시 읽지 않도록
+  }
 }
 function save() {
   try {
-    const raw = JSON.stringify(S), craw = JSON.stringify(cfg);
-    localStorage.setItem(K, raw);
-    localStorage.setItem(C, craw);
+    const raw = JSON.stringify({ q: S.q, d: S.d }), craw = JSON.stringify(cfg);
+    if (raw !== lastK) { localStorage.setItem(K, raw); lastK = raw; }
+    if (craw !== lastC) { localStorage.setItem(C, craw); lastC = craw; }
+    if (mode === 'control') {
+      const hraw = JSON.stringify(S.h);
+      if (hraw !== lastH) { localStorage.setItem(KH, hraw); lastH = hraw; }
+    }
     lastRaw = raw + '|' + craw;
   } catch (e) {}
 }
