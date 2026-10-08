@@ -505,7 +505,7 @@ function renderList() {
   const now = el('div', 'card now');
   if (S.q[0]) {
     const s0 = S.q[0], editing0 = editId === s0.id;
-    now.appendChild(el('div', 'badge', 'NOW PLAYING'));
+    now.appendChild(el('div', 'badge', 'NOW SINGING'));
     const line = el('div', 'line');
     let tc;
     if (editing0 || mode !== 'view') tc = titleCell(s0);   // 컨트롤부: 일반 텍스트(말줄임)
