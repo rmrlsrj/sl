@@ -118,9 +118,9 @@ body.control .now .t{font-size:1em}
 @keyframes mq{0%,15%{transform:translateX(0)}100%{transform:translateX(-50%)}}
 .badge{font-size:.55em;font-weight:800;background:#14ed9f;color:#04251a;padding:.2em .7em;border-radius:6px}
 /* NOW PLAYING 뱃지 이퀄라이저 (기본·글래스1·네온사인 공통): 막대 색은 뱃지 글자색을 그대로 사용.
-   블랙레드·라벤더·모노하트는 body.tk 쪽에서 --k-dot 색으로 따로 지정 */
+   블랙레드·라벤더·모노하트는 body.tk .badge 에서 --eq 를 --k-dot 색으로 지정 */
 .badge::before{content:"";display:inline-block;width:1em;height:.9em;margin-right:.55em;vertical-align:-.08em;
-  background:linear-gradient(currentColor 0 0) 0 100%/22% 40% no-repeat,linear-gradient(currentColor 0 0) 50% 100%/22% 85% no-repeat,linear-gradient(currentColor 0 0) 100% 100%/22% 60% no-repeat;
+  background:linear-gradient(var(--eq,currentColor) 0 0) 0 100%/22% 40% no-repeat,linear-gradient(var(--eq,currentColor) 0 0) 50% 100%/22% 85% no-repeat,linear-gradient(var(--eq,currentColor) 0 0) 100% 100%/22% 60% no-repeat;
   animation:keq 1.8s linear infinite}
 /* NOW PLAYING 뱃지를 곡명 시작선에 맞춤: 번호 칸(.no min-width 1.8em, 카드 글자 기준) + 간격 12px. 뱃지는 .55em이라 나눠서 환산 */
 .now .badge{margin-left:calc(1.8em / .55 + 12px)}
@@ -158,7 +158,7 @@ body.view .del,body.view .edt,body.view .skp,body.view .grip{display:none}
 #list .card.wait.after::after{bottom:-11px}
 
 /* ===== 뷰 스타일: 글래스 ♥ (body.glass) =====
-   OBS 브라우저 소스는 뒤 배경을 흐릴 수 없어서 blur 대신 진한 반투명 보라로 가독성 확보 */
+   OBS 브라우저 소스는 뒤 배경을 흐릴 수 없어서 blur 대신 진한 반투명 배경(검정 90%)으로 가독성 확보 */
 body.glass{--g-pink:#ff6fb5;--g-lav:#a99be8}
 body.glass #head,body.glass .card{
   background:rgba(26,26,28,.90);
@@ -170,13 +170,13 @@ body.glass .badge{background:linear-gradient(90deg,var(--g-pink),var(--g-lav));c
 body.glass .done{border-color:rgba(169,155,232,.15)}
 
 /* ===== 뷰 스타일: 네온사인 (body.neon) ===== */
-body.neon{--n-pink:#ff6fb5;--n-lav:#a99be8;--n-ink:#14101f}
+body.neon{--n-pink:#ff6fb5}
 body.neon #stage{margin:8px;padding:12px;border-radius:26px;
   background:linear-gradient(145deg,#211735,#14101f 62%,#1b1230);
   /* 선 없이 글로우만: 뷰 여백(12px) 안에서 잘리지 않게 좁고 세게 + 안쪽 가장자리 글로우 */
   box-shadow:0 0 5px 1px rgba(190,175,255,.95),0 0 11px 2px rgba(169,155,232,.60),inset 0 0 6px rgba(190,175,255,.60),inset 0 0 20px rgba(169,155,232,.30)}
 /* 뷰는 제어부보다 한 단계 넉넉하게: 카드와 네온 배경 테두리가 붙어 보이지 않도록 여백 확보 */
-body.view.neon #stage{margin:12px;padding:28px 26px}
+body.view.neon #stage{margin:12px;padding:26px}   /* 배경카드 안쪽 여백: 상하좌우 동일 */
 body.control.neon #stage{margin:0}
 body.neon #head,body.neon .card{
   background:linear-gradient(135deg,#2a1b47,#14101f 74%);
@@ -186,7 +186,6 @@ body.neon #head,body.neon .card{
 body.neon #head{border-color:rgba(169,155,232,.80);box-shadow:inset 0 0 14px rgba(169,155,232,.12),0 0 6px rgba(169,155,232,.28)}
 body.neon #head{margin:0 0 10px}
 /* 뷰 전용: 타이틀 카드를 위로 올리고, 나우 플레잉 카드의 네온 글로우와 겹치지 않게 간격 확보 */
-body.view.neon #stage{padding:26px}   /* 배경카드 안쪽 여백: 상하좌우 동일 */
 body.view.neon #head{margin:0 0 26px;padding-top:18px;padding-bottom:18px}   /* 타이틀 카드 상하 여유 */
 body.neon.view #list{padding:0}
 body.neon .no{color:rgba(201,190,255,.88)}
@@ -214,7 +213,7 @@ body.tk .card.wait .t{color:rgba(255,255,255,.88)}
 body.tk .done{border-color:var(--k-line)}
 body.tk .card.more{color:var(--k-no)}
 /* NOW PLAYING: 가장 또렷하게 + 숨쉬듯 천천히 점멸하는 글로우 */
-body.tk .now{position:relative;overflow:hidden;border:2px solid var(--k-a);
+body.tk .now{overflow:hidden;border:2px solid var(--k-a);
   background:var(--k-nbg);
   box-shadow:0 0 0 1px rgba(var(--k-a-rgb),.30),0 0 9px 1px rgba(var(--k-a-rgb),.55),0 0 18px 3px rgba(var(--k-a-rgb),.22),inset 0 0 18px rgba(var(--k-a-rgb),.12);
   animation:kglow 3.8s ease-in-out infinite}
@@ -224,10 +223,7 @@ body.tk .now{position:relative;overflow:hidden;border:2px solid var(--k-a);
 body.tk .now .t{text-shadow:0 0 10px rgba(var(--k-a-rgb),.55),0 0 2px rgba(255,255,255,.35)}
 body.tk .now .no{color:var(--k-a);text-shadow:0 0 10px rgba(var(--k-a-rgb),.9)}
 /* NOW PLAYING 뱃지: 이퀄라이저 막대(스포티파이·애플뮤직·유튜브뮤직 등의 "재생 중" 표시)가 오르내림 — 모양·움직임(keq)은 전 스타일 공통 */
-body.tk .badge{background:var(--k-badge);color:var(--k-badge-fg);letter-spacing:.05em;box-shadow:0 0 8px rgba(var(--k-a-rgb),.6)}
-body.tk .badge::before{content:"";display:inline-block;width:1em;height:.9em;margin-right:.55em;vertical-align:-.08em;
-  background:linear-gradient(var(--k-dot) 0 0) 0 100%/22% 40% no-repeat,linear-gradient(var(--k-dot) 0 0) 50% 100%/22% 85% no-repeat,linear-gradient(var(--k-dot) 0 0) 100% 100%/22% 60% no-repeat;
-  animation:keq 1.8s linear infinite}
+body.tk .badge{--eq:var(--k-dot);background:var(--k-badge);color:var(--k-badge-fg);letter-spacing:.05em;box-shadow:0 0 8px rgba(var(--k-a-rgb),.6)}
 /* 멈칫 없이 흐르도록: 구간마다 감속하지 않게 linear + 사인파로 촘촘히 샘플링한 키프레임 (3막대 박자 다름) */
 @keyframes keq{
   0%{background-size:22% 62%,22% 97%,22% 34%}
@@ -269,7 +265,7 @@ body.tk .badge::before{content:"";display:inline-block;width:1em;height:.9em;mar
   100%{background-size:22% 62%,22% 97%,22% 34%}}
 
 /* --- 블랙레드: 검정 점퍼 + 레드 소매 라인 (화려) --- */
-body.bred{--k-a:#ff2d46;--k-a-rgb:255,45,70;--k-sw:255,255,255;
+body.bred{--k-a:#ff2d46;--k-a-rgb:255,45,70;
   --k-bg1:rgba(34,17,20,.95);--k-bg2:rgba(13,11,12,.95);
   --k-line:rgba(255,45,70,.24);--k-line2:rgba(255,45,70,.60);--k-bar:rgba(225,29,52,.65);
   --k-no:rgba(255,165,175,.78);
@@ -281,7 +277,7 @@ body.bred .now::before{content:"";position:absolute;left:0;top:0;bottom:0;width:
   background:linear-gradient(90deg,#ff2d46 0 3px,transparent 3px 6px,rgba(255,45,70,.75) 6px 8px,transparent 8px)}
 
 /* --- 라벤더: 머리색 라벤더 + 아이스 블루 하이라이트 (은은하고 단정) --- */
-body.lav{--k-a:#a58bff;--k-a-rgb:165,139,255;--k-sw:225,232,255;
+body.lav{--k-a:#a58bff;--k-a-rgb:165,139,255;
   --k-bg1:rgba(33,27,62,.94);--k-bg2:rgba(16,13,32,.94);
   --k-line:rgba(165,139,255,.26);--k-line2:rgba(190,175,255,.60);--k-bar:rgba(165,139,255,.60);
   --k-no:rgba(207,216,255,.80);
@@ -293,7 +289,7 @@ body.lav .now::before{content:"";position:absolute;left:0;right:0;top:0;height:3
   background:linear-gradient(90deg,#8c78e0,#cfd8ff 55%,#8c78e0)}
 
 /* --- 모노하트: 검정·흰색 + 레드 포인트 (스켈레톤 하트 프린트 느낌) --- */
-body.mono{--k-a:#f4f4f6;--k-a-rgb:244,244,246;--k-sw:255,255,255;
+body.mono{--k-a:#f4f4f6;--k-a-rgb:244,244,246;
   --k-bg1:rgba(26,26,29,.95);--k-bg2:rgba(10,10,11,.95);
   --k-line:rgba(255,255,255,.15);--k-line2:rgba(255,255,255,.42);--k-bar:rgba(255,255,255,.38);
   --k-no:rgba(255,255,255,.58);
