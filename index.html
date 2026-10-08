@@ -127,6 +127,17 @@ body.control .now .t{font-size:1em}
 /* 뱃지 크기(.65em·굵기 900·패딩)는 전 스타일 공통. 기본·글래스1·네온사인은 여기에 자간 + 흰 테두리 링과 글로우를 추가
    (블랙레드·라벤더·모노하트(.tk)는 자체 자간·글로우 사용) */
 body:not(.tk) .badge{letter-spacing:.06em;box-shadow:0 0 0 1px rgba(255,255,255,.6),0 0 10px rgba(20,237,159,.7)}
+/* 카드 배경 이퀄라이저 (기본·블랙레드 전용): NOW SINGING 카드 뒤 오른쪽에서 은은하게, 왼쪽으로 갈수록 옅어짐.
+   이 두 스타일은 뱃지 안의 작은 이퀄라이저 대신 사용. 다른 스타일에서는 숨김 */
+.eqbg{display:none}
+body:not(.glass):not(.neon):not(.tk) .now{overflow:hidden}
+body:not(.glass):not(.neon):not(.tk) .eqbg,body.bred .eqbg{display:flex;position:absolute;right:0;top:0;bottom:0;width:58%;align-items:flex-end;gap:3px;padding:0 8px 0 0;pointer-events:none;z-index:0;
+  -webkit-mask-image:linear-gradient(to right,transparent,#000 75%);mask-image:linear-gradient(to right,transparent,#000 75%)}
+.eqbg i{flex:1;height:62%;background:var(--eqc,#14ed9f);opacity:var(--eqo,.15);border-radius:2px 2px 0 0;transform-origin:bottom;animation:eqbgk 1.2s ease-in-out infinite}
+body.bred .eqbg{--eqc:#ff2d46;--eqo:.22}
+@keyframes eqbgk{0%,100%{transform:scaleY(.12)}50%{transform:scaleY(1)}}
+body:not(.glass):not(.neon):not(.tk) .now>:not(.eqbg),body.bred .now>:not(.eqbg){position:relative;z-index:1}
+body:not(.glass):not(.neon):not(.tk) .badge::before,body.bred .badge::before{display:none}
 .empty{color:rgba(255,255,255,.55);font-weight:600}
 .done{opacity:.6}
 .done .t{text-decoration:line-through}
@@ -508,6 +519,14 @@ function renderList() {
   const now = el('div', 'card now');
   if (S.q[0]) {
     const s0 = S.q[0], editing0 = editId === s0.id;
+    const eqbg = el('div', 'eqbg');   // 카드 배경 이퀄라이저 (기본·블랙레드만 CSS로 표시)
+    for (let k = 0; k < 18; k++) {
+      const b = el('i'), r = ((k * 37) % 17) / 17;
+      b.style.animationDuration = (0.8 + r * 0.9).toFixed(2) + 's';
+      b.style.animationDelay = '-' + (r * 1.6).toFixed(2) + 's';
+      eqbg.appendChild(b);
+    }
+    now.appendChild(eqbg);
     now.appendChild(el('div', 'badge', 'NOW SINGING'));
     const line = el('div', 'line');
     let tc;
