@@ -318,6 +318,8 @@ body.kara .no{color:rgba(255,255,255,.88)}
 body.kara .card.more{color:rgba(255,255,255,.85)}
 body.kara .card .edit,body.kara .card button{-webkit-text-stroke:0;text-shadow:none}   /* 컨트롤부 입력칸·버튼에는 외곽선 없음 */
 body.kara .now{border-bottom:2px solid rgba(255,111,181,.85);box-shadow:0 8px 12px -10px rgba(255,111,181,.95)}
+/* 타이틀(서브·메인) 글자가 없어 타이틀 카드가 숨겨진 경우: NOW SINGING 위에 회색 줄을 기본으로 둠 (타이틀이 있으면 타이틀 아래 줄이 그 역할을 하므로 중복되지 않음) */
+body.kara #head[style*="display: none"] + #list .now{border-top:2px solid rgba(255,255,255,.55)}
 body.kara .now .t{text-shadow:0 0 14px rgba(255,111,181,.75),0 2px 6px rgba(0,0,0,.55)}
 body.kara .now .no{color:#ff8fc5;text-shadow:0 0 10px rgba(255,111,181,.9),0 2px 6px rgba(0,0,0,.55)}
 body.kara .badge{background:linear-gradient(90deg,#ff6fb5,#a99be8);color:#1a1030;letter-spacing:.06em;box-shadow:0 0 10px rgba(255,111,181,.8)}
