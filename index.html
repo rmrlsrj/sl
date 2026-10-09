@@ -312,6 +312,9 @@ body.mono .now::before{content:"";position:absolute;left:12%;right:12%;bottom:0;
 body.kara #head{background:none;border:1px solid transparent;border-bottom:2px solid rgba(255,255,255,.55);border-radius:0;box-shadow:0 3px 8px -4px rgba(0,0,0,.6)}
 body.kara .card{background:none;border:1px solid transparent;border-radius:0}
 body.kara #list{gap:4px}
+/* 방송 뷰 전용: 카드가 없어서 대기 곡이 멀어 보이므로 위아래 여백만 좁힘 (컨트롤부는 클릭하기 편하게 그대로). 더 좁히려면 .3em → .2em, 넓히려면 .4em */
+body.view.kara #list{gap:2px}
+body.view.kara .card:not(.now){padding-top:.3em;padding-bottom:.3em}
 body.kara .card .t,body.kara .card .no,body.kara .card.more,body.kara .empty,body.kara #head #title,body.kara #head #banner{
   -webkit-text-stroke:.11em rgba(0,0,0,.88);paint-order:stroke fill;text-shadow:0 2px 6px rgba(0,0,0,.40)}
 body.kara .no{color:rgba(255,255,255,.88)}
