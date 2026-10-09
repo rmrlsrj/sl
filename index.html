@@ -305,45 +305,7 @@ body.mono .now{animation-name:kglowm}
 /* 아랫변의 레드 포인트 라인 */
 body.mono .now::before{content:"";position:absolute;left:12%;right:12%;bottom:0;height:3px;pointer-events:none;
   background:linear-gradient(90deg,transparent,#ff2d46,transparent)}
-/* ===== 뷰 스타일: 카페메뉴판 (body.cafe) — 크림색 종이 메뉴판 =====
-   배경카드(#stage)를 종이 메뉴판으로, 타이틀(#head)은 진한 코코아색 띠로 만듦 (타이틀 글자색은 기존 설정 그대로 → 밝은 색이 잘 보임).
-   곡 줄은 카드 대신 점선으로 구분되는 메뉴 줄이고, NOW SINGING 은 "오늘의 추천 메뉴"처럼 딸기색 카드로 강조.
-   종이 색은 --cf-paper, 글자색은 --cf-ink, 강조색은 --cf-berry 에서 바꿈 */
-body.cafe{--cf-paper:#fbf4e2;--cf-paper2:#f3e6c8;--cf-ink:#4a2f22;--cf-line:rgba(110,72,48,.45);--cf-berry:#d9487f;--cf-berry-rgb:217,72,127}
-body.cafe #stage{margin:8px;padding:12px;border-radius:20px;
-  background:linear-gradient(180deg,var(--cf-paper),var(--cf-paper2));
-  box-shadow:inset 0 0 0 5px var(--cf-paper),inset 0 0 0 7px rgba(110,72,48,.50),0 6px 16px rgba(0,0,0,.35)}   /* 안쪽 이중 테두리 = 메뉴판 프레임 */
-body.view.cafe #stage{margin:12px;padding:26px}
-body.control.cafe #stage{margin:0;padding:14px}
-body.cafe #head{background:linear-gradient(180deg,#6b4433,#4a2f22);border:1px solid #3a2318;border-radius:12px;
-  box-shadow:inset 0 1px 0 rgba(255,255,255,.18),0 2px 0 rgba(74,47,34,.25)}
-body.view.cafe #head{margin:0 0 14px;padding-top:16px;padding-bottom:16px}
-body.view.cafe #list{padding:0}
-body.cafe .card{background:none;border:1px solid transparent;border-bottom:2px dotted var(--cf-line);border-radius:0}
-body.cafe .card .t{color:var(--cf-ink)}
-body.cafe .no{color:var(--cf-berry)}
-body.cafe .done{border-bottom-color:var(--cf-line)}
-body.cafe .card.more{color:#8a6a55;border-bottom:1px solid transparent}
-body.cafe .empty{color:#8a6a55}
-/* 컨트롤부: 밝은 종이 위에서도 보이도록 아이콘 색 조정 */
-body.cafe .edt,body.cafe .skp{color:#7a5a46}
-body.cafe .del{color:#c0392b}
-body.cafe .edt:hover,body.cafe .skp:hover,body.cafe .del:hover{background:rgba(74,47,34,.10)}
-body.cafe .grip{filter:brightness(0);opacity:.45}
-/* NOW SINGING: 딸기색 추천 메뉴 카드 + 종이에 번지듯 숨쉬는 은은한 글로우 */
-body.cafe .now{border:2px solid var(--cf-berry);border-radius:14px;
-  background:linear-gradient(135deg,#ffe6ee,#ffd1e0);
-  box-shadow:0 0 0 3px var(--cf-paper),0 0 0 4px rgba(var(--cf-berry-rgb),.45),0 0 10px 2px rgba(var(--cf-berry-rgb),.18);
-  animation:kcafe 3.8s ease-in-out infinite}
-@keyframes kcafe{
-  0%,100%{box-shadow:0 0 0 3px var(--cf-paper),0 0 0 4px rgba(var(--cf-berry-rgb),.40),0 0 8px 2px rgba(var(--cf-berry-rgb),.12)}
-  50%{box-shadow:0 0 0 3px var(--cf-paper),0 0 0 4px rgba(var(--cf-berry-rgb),.65),0 0 14px 3px rgba(var(--cf-berry-rgb),.32)}}
-body.cafe .now .t{color:#7a1f46}
-body.cafe .now .no{color:var(--cf-berry)}
-body.cafe .badge{background:linear-gradient(90deg,#e0568f,#b93a6e);color:#fff;letter-spacing:.06em;
-  box-shadow:inset 0 1px 0 rgba(255,255,255,.35),0 2px 6px rgba(150,40,90,.35)}
-
-/* ===== 뷰 스타일: 노래방자막 (body.kara) — 카드 없이 외곽선 글자만 =====
+/* ===== 뷰 스타일: 배경없음 (body.kara) — 카드 없이 외곽선 글자만 =====
    카드·배경을 모두 없애고 굵은 외곽선(검정) + 그림자로 어떤 배경에서도 읽히게 함. 글자 크기·여백은 다른 스타일과 같아서 타이틀 줄맞춤은 그대로.
    NOW SINGING 은 큰 글자 + 핑크 글로우 + 아래 핑크 밑줄 + 뱃지 이퀄라이저, 대기 곡은 차분하게(선명도 슬라이더 적용).
    외곽선 두께는 아래 .14em 숫자로 조절 (배경이 복잡하면 .18em 정도로) */
@@ -375,8 +337,7 @@ body.kara .badge{background:linear-gradient(90deg,#ff6fb5,#a99be8);color:#1a1030
         <button type="button" data-t="mono">화이트레드</button>
         <button type="button" data-t="lav">라벤더</button>
         <button type="button" data-t="neon">네온사인</button>
-        <button type="button" data-t="cafe">카페메뉴판</button>
-        <button type="button" data-t="kara">노래방자막</button>
+        <button type="button" data-t="kara">배경없음</button>
       </span>
     </div>
     <section class="sec">
@@ -614,7 +575,7 @@ function renderList() {
 }
 
 function render() {
-  const THEMES = ['glass', 'neon', 'bred', 'lav', 'mono', 'cafe', 'kara'];
+  const THEMES = ['glass', 'neon', 'bred', 'lav', 'mono', 'kara'];
   const th = THEMES.includes(cfg.theme) ? cfg.theme : 'classic';
   THEMES.forEach(t => document.body.classList.toggle(t, th === t));
   document.body.classList.toggle('tk', th === 'bred' || th === 'lav' || th === 'mono');
