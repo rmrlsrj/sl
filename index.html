@@ -117,15 +117,15 @@ body.control .now .t{font-size:1em}
 .mqt.run{animation:mq var(--mqd,10s) linear infinite}
 @keyframes mq{0%,15%{transform:translateX(0)}100%{transform:translateX(-50%)}}
 .badge{font-size:.65em;font-weight:900;background:#14ed9f;color:#04251a;padding:.22em .75em;border-radius:6px}
-/* NOW PLAYING 뱃지 이퀄라이저 (기본·글래스1·네온사인 공통): 막대 색은 뱃지 글자색을 그대로 사용.
-   블랙레드·라벤더·모노하트는 body.tk .badge 에서 --eq 를 --k-dot 색으로 지정 */
+/* NOW PLAYING 뱃지 이퀄라이저 (기본·소프트핑크·네온사인 공통): 막대 색은 뱃지 글자색을 그대로 사용.
+   블랙레드·화이트레드·라벤더는 body.tk .badge 에서 --eq 를 --k-dot 색으로 지정 */
 .badge::before{content:"";display:inline-block;width:1em;height:.9em;margin-right:.55em;vertical-align:-.08em;
   background:linear-gradient(var(--eq,currentColor) 0 0) 0 100%/22% 40% no-repeat,linear-gradient(var(--eq,currentColor) 0 0) 50% 100%/22% 85% no-repeat,linear-gradient(var(--eq,currentColor) 0 0) 100% 100%/22% 60% no-repeat;
   animation:keq 1.8s linear infinite}
 /* NOW PLAYING 뱃지를 곡명 시작선에 맞춤: 번호 칸(.no min-width 1.8em, 카드 글자 기준) + 간격 12px. 뱃지는 .65em이라 나눠서 환산 */
 .now .badge{margin-left:calc(1.8em / .65 + 12px)}
-/* 뱃지 크기(.65em·굵기 900·패딩)는 전 스타일 공통. 기본·글래스1·네온사인은 여기에 자간 + 흰 테두리 링과 글로우를 추가
-   (블랙레드·라벤더·모노하트(.tk)는 자체 자간·글로우 사용) */
+/* 뱃지 크기(.65em·굵기 900·패딩)는 전 스타일 공통. 기본·소프트핑크·네온사인은 여기에 자간 + 흰 테두리 링과 글로우를 추가
+   (블랙레드·화이트레드·라벤더(.tk)는 자체 자간·글로우 사용) */
 body:not(.tk) .badge{letter-spacing:.06em;box-shadow:0 0 0 1px rgba(255,255,255,.6),0 0 10px rgba(20,237,159,.7)}
 .empty{color:rgba(255,255,255,.55);font-weight:600}
 .done{opacity:.6}
@@ -159,7 +159,7 @@ body:not(.tk) .badge{letter-spacing:.06em;box-shadow:0 0 0 1px rgba(255,255,255,
 #list .card.wait.before::before{top:-11px}
 #list .card.wait.after::after{bottom:-11px}
 
-/* ===== 뷰 스타일: 글래스 ♥ (body.glass) =====
+/* ===== 뷰 스타일: 소프트핑크 (body.glass) =====
    OBS 브라우저 소스는 뒤 배경을 흐릴 수 없어서 blur 대신 진한 반투명 배경(검정 90%)으로 가독성 확보 */
 body.glass{--g-pink:#ff6fb5;--g-lav:#a99be8}
 body.glass #head,body.glass .card{
@@ -200,7 +200,7 @@ body.neon .now .t{text-shadow:0 0 9px rgba(255,255,255,.5),0 0 16px rgba(255,111
 body.neon .now .no{color:#ff8fc5;text-shadow:0 0 10px rgba(255,111,181,.9)}
 body.neon .badge{background:linear-gradient(90deg,#ff6fb5,#a99be8);color:#14101f;letter-spacing:.06em;box-shadow:0 0 12px rgba(255,111,181,.95)}
 
-/* ===== 뷰 스타일 3종 공통 (body.tk): 블랙레드 / 라벤더 / 모노하트 =====
+/* ===== 뷰 스타일 3종 공통 (body.tk): 블랙레드 / 화이트레드 / 라벤더 =====
    색은 변수로만 바꾸고, 움직임(글로우 점멸·이퀄라이저)은 NOW PLAYING 카드에서만 사용 */
 body.tk #head,body.tk .card{
   background:linear-gradient(135deg,var(--k-bg1),var(--k-bg2) 74%);
@@ -290,7 +290,7 @@ body.lav #head{box-shadow:0 0 6px rgba(165,139,255,.22)}
 body.lav .now::before{content:"";position:absolute;left:0;right:0;top:0;height:3px;pointer-events:none;
   background:linear-gradient(90deg,#8c78e0,#cfd8ff 55%,#8c78e0)}
 
-/* --- 모노하트: 검정·흰색 + 레드 포인트 (스켈레톤 하트 프린트 느낌) --- */
+/* --- 화이트레드: 검정·흰색 + 레드 포인트 (body.mono) --- */
 body.mono{--k-a:#f4f4f6;--k-a-rgb:244,244,246;
   --k-bg1:rgba(26,26,29,.95);--k-bg2:rgba(10,10,11,.95);
   --k-line:rgba(255,255,255,.15);--k-line2:rgba(255,255,255,.42);--k-bar:rgba(255,255,255,.38);
@@ -316,11 +316,11 @@ body.mono .now::before{content:"";position:absolute;left:12%;right:12%;bottom:0;
       <span style="font-weight:700;font-size:13px;color:#c8cad4">뷰 스타일</span>
       <span class="seg" id="thm">
         <button type="button" data-t="classic">기본</button>
-        <button type="button" data-t="glass">글래스1</button>
-        <button type="button" data-t="neon">네온사인</button>
+        <button type="button" data-t="glass">소프트핑크</button>
         <button type="button" data-t="bred">블랙레드</button>
+        <button type="button" data-t="mono">화이트레드</button>
         <button type="button" data-t="lav">라벤더</button>
-        <button type="button" data-t="mono">모노하트</button>
+        <button type="button" data-t="neon">네온사인</button>
       </span>
     </div>
     <section class="sec">
