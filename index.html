@@ -28,7 +28,7 @@ body.view #panel,body.view #dock,body.view .foot{display:none}
 #dock{position:sticky;top:0;z-index:20;margin:0 -10px 10px;padding:10px 10px 8px;background:#1c1d23;border-bottom:1px solid #33353f}
 .addbox{position:relative}
 #add{position:absolute;right:20px;bottom:8px;padding:6px 14px}
-.row.act{flex-wrap:nowrap}   /* .row 보다 뒤에 있어야 먹히던 규칙 → .row.act 로 우선순위 확보 */
+.row.act{flex-wrap:nowrap}   /* .row 의 flex-wrap:wrap 보다 우선하도록 .row.act */
 .act .big{flex:1;padding:12px 14px;font-size:17px}
 .act .sub{padding:12px 14px}
 button.ghost{background:none;border:1px solid #3a3c46;color:#c8cad4;padding:5px 10px;font-size:13px}
@@ -50,7 +50,7 @@ label{display:flex;align-items:center;gap:6px;color:#c8cad4}
 #settings{margin-top:4px}
 #settings > .row:first-child{background:#303342;border:1px solid #3a3c4a;border-radius:10px;padding:10px 12px;justify-content:center}   /* 뷰 스타일 칸을 밝게 구분 */
 #settings > .row:first-child > span:first-child{flex:0 0 100%;text-align:center}   /* 라벨은 윗줄 가운데 */
-/* 뷰 스타일 버튼: 눌러서 바꾸는 버튼으로 보이도록 테두리·입체감·균등 폭 */
+/* 선택형 버튼 줄 배치: 뷰 스타일(#thm)은 폭 전체·가운데 정렬, 대기 곡 수(#nxs)는 간격만 */
 #thm{width:100%;justify-content:center;gap:6px;flex-wrap:wrap}
 #nxs{gap:6px;flex-wrap:wrap}
 /* 선택형 버튼(뷰 스타일·뷰에 보일 대기 곡 수) 공통 모양 */
@@ -94,7 +94,7 @@ body.control #head{--pl:10px;--pr:10px;margin:0 0 10px;padding:8px 10px}
 .prow button{padding:5px 9px}
 .phint{margin-top:8px;font-size:12px;color:#8a8d9a}
 
-/* 상단 메시지 */
+/* 서브 타이틀 (첫째 줄, 코드명 banner·msg) */
 #banner{display:none;line-height:1.3;white-space:pre-wrap;word-break:break-all;font-size:calc(var(--mfs)*1px)}
 body.control #banner{font-size:max(11px,calc(var(--mfs)*.4px))}
 
@@ -308,7 +308,7 @@ body.mono .now::before{content:"";position:absolute;left:12%;right:12%;bottom:0;
 /* ===== 뷰 스타일: 배경없음 (body.kara) — 카드 없이 외곽선 글자만 =====
    카드·배경을 모두 없애고 굵은 외곽선(검정) + 그림자로 어떤 배경에서도 읽히게 함. 글자 크기·여백은 다른 스타일과 같아서 타이틀 줄맞춤은 그대로.
    NOW SINGING 은 큰 글자 + 핑크 글로우 + 아래 핑크 밑줄 + 뱃지 이퀄라이저, 대기 곡은 차분하게(선명도 슬라이더 적용).
-   외곽선 두께는 아래 .14em 숫자로 조절 (배경이 복잡하면 .18em 정도로) */
+   외곽선 두께는 아래 .11em 숫자로 조절 (배경이 복잡하면 .18em 정도로) */
 body.kara #head{background:none;border:1px solid transparent;border-bottom:2px solid rgba(255,255,255,.55);border-radius:0;box-shadow:0 3px 8px -4px rgba(0,0,0,.6)}
 body.kara .card{background:none;border:1px solid transparent;border-radius:0}
 body.kara #list{gap:4px}
@@ -521,10 +521,11 @@ function finishEdit(saveIt) {
 function renderList() {
   const listEl = $('list');
   suppressBlur = true; listEl.textContent = ''; suppressBlur = false;
+  listEl.style.fontWeight = '';   // 웹폰트 → 기본 글꼴로 되돌릴 때 이전 굵기가 남지 않게 초기화
   applyFont(listEl, cfg.lf);
   const nd = S.d.length;
 
-  // Now Playing
+  // NOW SINGING (현재 곡)
   const now = el('div', 'card now');
   if (S.q[0]) {
     const s0 = S.q[0], editing0 = editId === s0.id;
@@ -612,7 +613,7 @@ function render() {
   applyFont(B, cfg.mf);
   mbEl.disabled = WEB_NAMES.has(cfg.mf);
   document.querySelectorAll('#mal button').forEach(b => b.classList.toggle('on', b.dataset.a === cfg.ma));
-  // 목록은 곡·편집 상태·목록 폰트·숨김 설정이 바뀔 때만 다시 그림 (그 외 설정 변경 시 마퀴 유지)
+  // 목록은 곡·편집 상태·목록 폰트·숨김 설정·뷰 대기 곡 수가 바뀔 때만 다시 그림 (그 외 설정 변경 시 마퀴 유지)
   const key = JSON.stringify([S.q, S.d, editId, cfg.lf, cfg.hide, cfg.nx]);
   const rebuilt = key !== listKey;
   if (rebuilt) { listKey = key; renderList(); }
@@ -800,6 +801,7 @@ resetBtn.onclick = () => {
     armTimer = setTimeout(disarm, 3000); return;
   }
   disarm();
+  if (!S.q.length && !S.d.length) return;   // 빈 목록이면 되돌리기 기록을 쌓지 않음
   commit(() => { S.q = []; S.d = []; });
 };
 function disarm() {
@@ -807,7 +809,7 @@ function disarm() {
   resetBtn.classList.remove('arm'); resetBtn.textContent = '전체 초기화';
 }
 
-/* 삭제 */
+/* 카드 버튼 처리: 삭제 · 수정 · 맨 뒤로 보내기 */
 $('list').addEventListener('click', e => {
   const b = e.target.closest('.del, .edt, .skp');
   if (!b || b.disabled) return;
@@ -915,7 +917,7 @@ copyBtn.onclick = () => {
     .then(() => flashCopy('복사됨!'), () => flashCopy('복사 실패'));
 };
 
-/* 글자색 팔레트: 6칸 공유, 적용은 제목/메시지 각각 */
+/* 글자색 팔레트: 6칸 공유, 적용은 메인 타이틀/서브 타이틀 각각 */
 const pal = $('pal'), pslots = $('pslots'),
       pcol = $('pcol'), pedit = $('pedit'),
       prst = $('prst'), phint = $('phint');
