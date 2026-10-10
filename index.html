@@ -28,10 +28,9 @@ body.view #panel,body.view #dock,body.view .foot{display:none}
 #dock{position:sticky;top:0;z-index:20;margin:0 -10px 10px;padding:10px 10px 8px;background:#1c1d23;border-bottom:1px solid #33353f}
 .addbox{position:relative}
 #add{position:absolute;right:20px;bottom:8px;padding:6px 14px}
-.act{flex-wrap:nowrap}
+.row.act{flex-wrap:nowrap}   /* .row 보다 뒤에 있어야 먹히던 규칙 → .row.act 로 우선순위 확보 */
 .act .big{flex:1;padding:12px 14px;font-size:17px}
 .act .sub{padding:12px 14px}
-.foot{margin-top:12px}
 button.ghost{background:none;border:1px solid #3a3c46;color:#c8cad4;padding:5px 10px;font-size:13px}
 button.ghost:hover{background:rgba(255,255,255,.08)}
 #ta:focus{outline:2px solid #e0b93a;outline-offset:0}
