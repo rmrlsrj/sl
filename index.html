@@ -312,8 +312,6 @@ body.mono .now::before{content:"";position:absolute;left:12%;right:12%;bottom:0;
    외곽선 두께는 아래 .14em 숫자로 조절 (배경이 복잡하면 .18em 정도로) */
 body.kara #head{background:none;border:1px solid transparent;border-bottom:2px solid rgba(255,255,255,.55);border-radius:0;box-shadow:0 3px 8px -4px rgba(0,0,0,.6)}
 body.kara .card{background:none;border:1px solid transparent;border-radius:0}
-/* 타이틀·서브 타이틀이 모두 비면 글자 없이 상단 줄만 남김 */
-body.kara #head.bare{padding-top:0;padding-bottom:0}
 body.kara #list{gap:4px}
 /* 방송 뷰 전용: 카드가 없어서 대기 곡이 멀어 보이므로 위아래 여백만 좁힘 (컨트롤부는 클릭하기 편하게 그대로). 더 좁히려면 .3em → .2em, 넓히려면 .4em */
 body.view.kara #list{gap:2px}
@@ -604,8 +602,7 @@ function render() {
   const B = $('banner');
   B.textContent = cfg.msg;
   B.style.display = cfg.msg ? 'block' : 'none';
-  $('head').style.display = (cfg.tt || cfg.msg || th === 'kara') ? 'block' : 'none';   // 배경없음은 글자가 없어도 상단 줄을 남김
-  $('head').classList.toggle('bare', !cfg.tt && !cfg.msg);
+  $('head').style.display = (cfg.tt || cfg.msg) ? 'block' : 'none';
   $('head').style.opacity = (cfg.to == null ? 100 : cfg.to) / 100;
   B.classList.toggle('sp', !!(cfg.tt && cfg.msg));
   B.style.fontWeight = cfg.mb ? '800' : '400';
