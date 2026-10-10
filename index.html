@@ -117,15 +117,16 @@ body.control .now .t{font-size:1em}
 .mqt.run{animation:mq var(--mqd,10s) linear infinite}
 @keyframes mq{0%,15%{transform:translateX(0)}100%{transform:translateX(-50%)}}
 .badge{font-size:.65em;font-weight:900;background:#14ed9f;color:#04251a;padding:.22em .75em;border-radius:6px}
-/* NOW PLAYING 뱃지 이퀄라이저 (기본·소프트핑크·네온사인 공통): 막대 색은 뱃지 글자색을 그대로 사용.
+/* NOW SINGING 뱃지 이퀄라이저 (기본·소프트핑크·네온사인 공통): 막대 색은 뱃지 글자색을 그대로 사용.
    블랙레드·화이트레드·라벤더는 body.tk .badge 에서 --eq 를 --k-dot 색으로 지정 */
 .badge::before{content:"";display:inline-block;width:1em;height:.9em;margin-right:.55em;vertical-align:-.08em;
   background:linear-gradient(var(--eq,currentColor) 0 0) 0 100%/22% 40% no-repeat,linear-gradient(var(--eq,currentColor) 0 0) 50% 100%/22% 85% no-repeat,linear-gradient(var(--eq,currentColor) 0 0) 100% 100%/22% 60% no-repeat;
   animation:keq 1.8s linear infinite}
-/* NOW PLAYING 뱃지를 곡명 시작선에 맞춤: 번호 칸(.no min-width 1.8em, 카드 글자 기준) + 간격 12px. 뱃지는 .65em이라 나눠서 환산 */
+/* NOW SINGING 뱃지를 곡명 시작선에 맞춤: 번호 칸(.no min-width 1.8em, 카드 글자 기준) + 간격 12px. 뱃지는 .65em이라 나눠서 환산 */
 .now .badge{margin-left:calc(1.8em / .65 + 12px)}
-/* 뱃지 크기(.65em·굵기 900·패딩)는 전 스타일 공통. 기본·소프트핑크·네온사인은 여기에 자간 + 흰 테두리 링과 글로우를 추가
-   (블랙레드·화이트레드·라벤더(.tk)는 자체 자간·글로우 사용) */
+/* 뱃지 크기(.65em·굵기 900·패딩)는 전 스타일 공통. 자간(.06em)은 .tk 가 아닌 스타일 공통.
+   흰 테두리 링 + 글로우는 기본 스타일에만 남음 (소프트핑크·네온사인·배경없음은 자체 글로우로 덮어씀,
+   블랙레드·화이트레드·라벤더(.tk)는 자체 자간·글로우 사용) */
 body:not(.tk) .badge{letter-spacing:.06em;box-shadow:0 0 0 1px rgba(255,255,255,.6),0 0 10px rgba(20,237,159,.7)}
 .empty{color:rgba(255,255,255,.55);font-weight:600}
 .done{opacity:.6}
@@ -168,7 +169,7 @@ body.glass #head,body.glass .card{
 body.glass .no{color:rgba(201,190,255,.78)}
 body.glass .now .t{text-shadow:0 0 12px rgba(255,111,181,.55)}
 body.glass .now .no{color:var(--g-pink)}
-body.glass .badge{background:linear-gradient(90deg,var(--g-pink),var(--g-lav));color:#1a1030;letter-spacing:.06em;box-shadow:0 0 10px rgba(255,111,181,.7)}
+body.glass .badge{background:linear-gradient(90deg,var(--g-pink),var(--g-lav));color:#1a1030;box-shadow:0 0 10px rgba(255,111,181,.7)}
 body.glass .done{border-color:rgba(169,155,232,.15)}
 
 /* ===== 뷰 스타일: 네온사인 (body.neon) ===== */
@@ -198,10 +199,10 @@ body.neon .now{border:2px solid var(--n-pink);background:linear-gradient(135deg,
 body.view.neon .now{box-shadow:0 0 0 3px var(--n-pink),0 0 14px 3px rgba(255,111,181,.95),0 0 28px 6px rgba(255,111,181,.48),inset 0 0 22px rgba(255,111,181,.18)}
 body.neon .now .t{text-shadow:0 0 9px rgba(255,255,255,.5),0 0 16px rgba(255,111,181,.72)}
 body.neon .now .no{color:#ff8fc5;text-shadow:0 0 10px rgba(255,111,181,.9)}
-body.neon .badge{background:linear-gradient(90deg,#ff6fb5,#a99be8);color:#14101f;letter-spacing:.06em;box-shadow:0 0 12px rgba(255,111,181,.95)}
+body.neon .badge{background:linear-gradient(90deg,#ff6fb5,#a99be8);color:#14101f;box-shadow:0 0 12px rgba(255,111,181,.95)}
 
 /* ===== 뷰 스타일 3종 공통 (body.tk): 블랙레드 / 화이트레드 / 라벤더 =====
-   색은 변수로만 바꾸고, 움직임(글로우 점멸·이퀄라이저)은 NOW PLAYING 카드에서만 사용 */
+   색은 변수로만 바꾸고, 움직임(글로우 점멸·이퀄라이저)은 NOW SINGING 카드에서만 사용 */
 body.tk #head,body.tk .card{
   background:linear-gradient(135deg,var(--k-bg1),var(--k-bg2) 74%);
   border:1px solid var(--k-line);border-radius:14px}
@@ -214,7 +215,7 @@ body.tk .card.wait{box-shadow:inset 3px 0 0 var(--k-bar)}
 body.tk .card.wait .t{color:rgba(255,255,255,.88)}
 body.tk .done{border-color:var(--k-line)}
 body.tk .card.more{color:var(--k-no)}
-/* NOW PLAYING: 가장 또렷하게 + 숨쉬듯 천천히 점멸하는 글로우 */
+/* NOW SINGING: 가장 또렷하게 + 숨쉬듯 천천히 점멸하는 글로우 */
 body.tk .now{overflow:hidden;border:2px solid var(--k-a);
   background:var(--k-nbg);
   box-shadow:0 0 0 1px rgba(var(--k-a-rgb),.30),0 0 9px 1px rgba(var(--k-a-rgb),.55),0 0 18px 3px rgba(var(--k-a-rgb),.22),inset 0 0 18px rgba(var(--k-a-rgb),.12);
@@ -224,7 +225,7 @@ body.tk .now{overflow:hidden;border:2px solid var(--k-a);
   50%{box-shadow:0 0 0 1px rgba(var(--k-a-rgb),.45),0 0 12px 2px rgba(var(--k-a-rgb),.85),0 0 24px 5px rgba(var(--k-a-rgb),.38),inset 0 0 24px rgba(var(--k-a-rgb),.20)}}
 body.tk .now .t{text-shadow:0 0 10px rgba(var(--k-a-rgb),.55),0 0 2px rgba(255,255,255,.35)}
 body.tk .now .no{color:var(--k-a);text-shadow:0 0 10px rgba(var(--k-a-rgb),.9)}
-/* NOW PLAYING 뱃지: 이퀄라이저 막대(스포티파이·애플뮤직·유튜브뮤직 등의 "재생 중" 표시)가 오르내림 — 모양·움직임(keq)은 전 스타일 공통 */
+/* NOW SINGING 뱃지: 이퀄라이저 막대(스포티파이·애플뮤직·유튜브뮤직 등의 "재생 중" 표시)가 오르내림 — 모양·움직임(keq)은 전 스타일 공통 */
 body.tk .badge{--eq:var(--k-dot);background:var(--k-badge);color:var(--k-badge-fg);letter-spacing:.05em;box-shadow:0 0 8px rgba(var(--k-a-rgb),.6)}
 /* 멈칫 없이 흐르도록: 구간마다 감속하지 않게 linear + 사인파로 촘촘히 샘플링한 키프레임 (3막대 박자 다름) */
 @keyframes keq{
@@ -311,6 +312,8 @@ body.mono .now::before{content:"";position:absolute;left:12%;right:12%;bottom:0;
    외곽선 두께는 아래 .14em 숫자로 조절 (배경이 복잡하면 .18em 정도로) */
 body.kara #head{background:none;border:1px solid transparent;border-bottom:2px solid rgba(255,255,255,.55);border-radius:0;box-shadow:0 3px 8px -4px rgba(0,0,0,.6)}
 body.kara .card{background:none;border:1px solid transparent;border-radius:0}
+/* 타이틀·서브 타이틀이 모두 비면 글자 없이 상단 줄만 남김 */
+body.kara #head.bare{padding-top:0;padding-bottom:0}
 body.kara #list{gap:4px}
 /* 방송 뷰 전용: 카드가 없어서 대기 곡이 멀어 보이므로 위아래 여백만 좁힘 (컨트롤부는 클릭하기 편하게 그대로). 더 좁히려면 .3em → .2em, 넓히려면 .4em */
 body.view.kara #list{gap:2px}
@@ -323,7 +326,7 @@ body.kara .card .edit,body.kara .card button{-webkit-text-stroke:0;text-shadow:n
 body.kara .now{border-bottom:2px solid rgba(255,111,181,.85);box-shadow:0 8px 12px -10px rgba(255,111,181,.95)}
 body.kara .now .t{text-shadow:0 0 14px rgba(255,111,181,.75),0 2px 6px rgba(0,0,0,.55)}
 body.kara .now .no{color:#ff8fc5;text-shadow:0 0 10px rgba(255,111,181,.9),0 2px 6px rgba(0,0,0,.55)}
-body.kara .badge{background:linear-gradient(90deg,#ff6fb5,#a99be8);color:#1a1030;letter-spacing:.06em;box-shadow:0 0 10px rgba(255,111,181,.8)}
+body.kara .badge{background:linear-gradient(90deg,#ff6fb5,#a99be8);color:#1a1030;box-shadow:0 0 10px rgba(255,111,181,.8)}
 </style>
 </head>
 <body>
@@ -601,7 +604,8 @@ function render() {
   const B = $('banner');
   B.textContent = cfg.msg;
   B.style.display = cfg.msg ? 'block' : 'none';
-  $('head').style.display = (cfg.tt || cfg.msg) ? 'block' : 'none';
+  $('head').style.display = (cfg.tt || cfg.msg || th === 'kara') ? 'block' : 'none';   // 배경없음은 글자가 없어도 상단 줄을 남김
+  $('head').classList.toggle('bare', !cfg.tt && !cfg.msg);
   $('head').style.opacity = (cfg.to == null ? 100 : cfg.to) / 100;
   B.classList.toggle('sp', !!(cfg.tt && cfg.msg));
   B.style.fontWeight = cfg.mb ? '800' : '400';
@@ -645,7 +649,7 @@ function fitMarquee() {
     }
   });
 }
-/* 뷰 자동 맞춤: 우선순위 NOW PLAYING > 대기 곡 > 부른 곡(오래된 것부터 생략).
+/* 뷰 자동 맞춤: 우선순위 NOW SINGING > 대기 곡 > 부른 곡(오래된 것부터 생략).
    1) 내용이 창 높이를 넘으면 가장 오래된 '부른 곡'부터 숨김  2) 그래도 넘으면 #stage 를 통째로 축소 */
 const FIT_MIN = 0.5;   // 최소 배율 (이보다 작게는 줄이지 않음)
 let lastZoom = 1;
