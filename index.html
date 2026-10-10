@@ -431,31 +431,33 @@ let listKey = '', lastFs, lastTheme;   // 목록 재생성 판단용
 let lastK = '', lastC = '', lastH = '';   // 저장소에 마지막으로 쓴(읽은) 문자열: 바뀐 것만 다시 씀
 function load() {
   let raw = '', craw = '';
+  try { raw = localStorage.getItem(K) || ''; craw = localStorage.getItem(C) || ''; } catch (e) {}
+  // 곡 목록·설정·되돌리기 기록을 각각 따로 읽음: 한쪽 데이터가 깨져도 나머지는 살아남음
   try {
-    raw = localStorage.getItem(K) || '';
-    craw = localStorage.getItem(C) || '';
     const s = JSON.parse(raw || 'null');
     const oldH = s && Array.isArray(s.h) ? s.h : [];   // 예전 형식(곡 목록 안에 기록 포함) 이어받기
     if (s && Array.isArray(s.q) && Array.isArray(s.d)) S = { q: s.q, d: s.d, h: mode === 'control' ? oldH : [] };
     else S = { q: [], d: [], h: [] };
+  } catch (e) {}
+  try {
     const c = JSON.parse(craw || 'null');
     if (c) cfg = { ...cfg, ...c };
     cfg.sw = DEF_SW.map((d, i) => {
       const v = (Array.isArray(cfg.sw) ? cfg.sw : [])[i];
       return typeof v === 'string' && /^#[0-9a-f]{6}$/i.test(v) ? v.toLowerCase() : d;
     });
-    if (mode === 'control') {   // 되돌리기 기록은 컨트롤부만 읽음
+  } catch (e) {}
+  if (mode === 'control') {   // 되돌리기 기록은 컨트롤부만 읽음
+    try {
       const hraw = localStorage.getItem(KH);
       if (hraw !== null) {
         const h = JSON.parse(hraw);
         if (Array.isArray(h)) { S.h = h; lastH = hraw; }
       }
-    }
-  } catch (e) {
-  } finally {
-    lastK = raw; lastC = craw;
-    lastRaw = raw + '|' + craw;   // 파싱에 실패해도 갱신: sync()가 매초 다시 읽지 않도록
+    } catch (e) {}
   }
+  lastK = raw; lastC = craw;
+  lastRaw = raw + '|' + craw;   // 파싱에 실패해도 갱신: sync()가 매초 다시 읽지 않도록
 }
 function save() {
   try {
